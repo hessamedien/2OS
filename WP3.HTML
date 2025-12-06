@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویندوزفون 11 - Hessamedien</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0078d4;
+            --secondary-color: #005a9e;
+            --accent-color: #008575;
+            --background-color: #f3f3f3;
+            --surface-color: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --success-color: #107c10;
+            --warning-color: #ffb900;
+            --error-color: #e81123;
+            --tile-small: 150px;
+            --tile-medium: 310px;
+            --tile-wide: 310px;
+            --tile-large: 310px;
+            --tile-extra-large: 470px;
+            --transition-speed: 0.3s;
+            --background-image: none;
+        }
+
+        .dark-theme {
+            --primary-color: #008575;
+            --secondary-color: #006c5c;
+            --accent-color: #0078d4;
+            --background-color: #1e1e1e;
+            --surface-color: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: all var(--transition-speed) ease;
+            user-select: none;
+            background-image: var(--background-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 10px;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-theme .header {
+            background-color: rgba(45, 45, 45, 0.8);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .battery-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .battery-level {
+            width: 20px;
+            height: 10px;
+            background-color: var(--success-color);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .battery-level::after {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 2px;
+            width: 3px;
+            height: 6px;
+            background-color: var(--text-primary);
+            border-radius: 0 1px 1px 0;
+        }
+
+        .time-display {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-theme .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-container {
+            position: relative;
+            margin: 0 10px;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            transition: all var(--transition-speed);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .tiles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            flex-grow: 1;
+            transition: all var(--transition-speed);
+        }
+
+        .tile {
+            background-color: var(--surface-color);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tile.dragging {
+            opacity: 0.7;
+            transform: rotate(5deg);
+        }
+
+        .tile-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            transition: transform var(--transition-speed);
+        }
+
+        .tile:hover .tile-icon {
+            transform: scale(1.1);
+        }
+
+        .tile-title {
+            font-size: 14px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .tile.small {
+            grid-column: span 1;
+            grid-row: span 1;
+            min-height: 150px;
+        }
+
+        .tile.medium {
+            grid-column: span 2;
+            grid-row: span 1;
+            min-height: 150px;
+        }
+
+        .tile.wide {
+            grid-column: span 2;
+            grid-row: span 1;
+            min-height: 150px;
+        }
+
+        .tile.large {
+            grid-column: span 2;
+            grid-row: span 2;
+            min-height: 310px;
+        }
+
+        .tile.extra-large {
+            grid-column: span 3;
+            grid-row: span 2;
+            min-height: 310px;
+        }
+
+        .tile-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .live-tile {
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn var(--transition-speed);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            border-radius: 10px;
+            width: 90%;
+            height: 90%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: transform var(--transition-speed);
+        }
+
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .webapp-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background-color: var(--surface-color);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            overflow-y: auto;
+            padding: 20px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .setting-label {
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform var(--transition-speed);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .size-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .size-option {
+            padding: 5px 10px;
+            background-color: var(--background-color);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all var(--transition-speed);
+        }
+
+        .size-option:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .size-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .news-feed {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .news-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .news-source {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-header {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: 500;
+            font-size: 12px;
+            padding: 5px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .calendar-day:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .calendar-day.today {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            cursor: se-resize;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tile:hover .resize-handle {
+            opacity: 0.7;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background-color var(--transition-speed);
+        }
+
+        .app-icon:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .app-icon-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .app-icon-name {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .gallery-item {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: transform var(--transition-speed);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1002;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .page-btn {
+            padding: 8px 15px;
+            background-color: var(--surface-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .page-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .page-btn:hover:not(.active) {
+            background-color: var(--background-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .background-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .background-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform var(--transition-speed);
+            overflow: hidden;
+        }
+
+        .background-option:hover {
+            transform: scale(1.1);
+        }
+
+        .background-option.active {
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .background-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .setting-option {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: var(--background-color);
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .setting-option:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-theme .setting-option:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .tiles-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .tile.extra-large {
+                grid-column: span 2;
+            }
+            
+            .settings-panel {
+                width: 100%;
+            }
+            
+            .header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .search-container {
+                order: 3;
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .nav-buttons {
+                order: 2;
+            }
+            
+            .status-bar {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .header {
+                padding: 10px;
+            }
+            
+            .logo {
+                font-size: 18px;
+            }
+            
+            .time-display {
+                font-size: 14px;
+            }
+            
+            .tile {
+                padding: 10px;
+            }
+            
+            .tile-icon {
+                font-size: 24px;
+            }
+            
+            .tile-title {
+                font-size: 12px;
+            }
+            
+            .nav-btn span {
+                display: none;
+            }
+            
+            .nav-btn i {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-mobile-alt logo-icon"></i>
+                <span>ویندوزفون 11</span>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="جستجو در برنامه‌ها...">
+            </div>
+            
+            <div class="status-bar">
+                <div class="battery-status">
+                    <div class="battery-level" id="batteryLevel"></div>
+                    <span id="batteryPercent">85%</span>
+                </div>
+                <div class="network-status">
+                    <i class="fas fa-wifi" id="networkIcon"></i>
+                </div>
+                <div class="time-display" id="timeDisplay">در حال بارگذاری...</div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" id="homeBtn">
+                    <i class="fas fa-home"></i>
+                    <span>خانه</span>
+                </button>
+                <button class="nav-btn" id="backBtn">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>بازگشت</span>
+                </button>
+                <button class="nav-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                    <span>جستجو</span>
+                </button>
+                <button class="nav-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    <span>تنظیمات</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="tiles-container" id="tilesContainer">
+            <!-- کاشی‌ها به صورت داینامیک توسط جاوااسکریپت ایجاد می‌شوند -->
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <!-- صفحه‌بندی به صورت داینامیک ایجاد می‌شود -->
+        </div>
+    </div>
+
+    <!-- مودال برای نمایش برنامه‌ها -->
+    <div class="modal" id="appModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>برنامه</span>
+                </div>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- محتوای مودال -->
+            </div>
+        </div>
+    </div>
+
+    <!-- پنل تنظیمات -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-section">
+            <div class="settings-title">
+                <i class="fas fa-palette"></i>
+                <span>تنظیمات نمایش</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">حالت تاریک</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">رنگ تم</span>
+                <div class="color-picker">
+                    <div class="color-option active" style="background-color: #0078d4;" data-color="#0078d4"></div>
+                    <div class="color-option" style="background-color: #e81123;" data-color="#e81123"></div>
+                    <div class="color-option" style="background-color: #107c10;" data-color="#107c10"></div>
+                    <div class="color-option" style="background-color: #ffb900;" data-color="#ffb900"></div>
+                    <div class="color-option" style="background-color: #744da9;" data-color="#744da9"></div>
+                    <div class="color-option" style="background-color: #ff8c00;" data-color="#ff8c00"></div>
+                    <div class="color-option" style="background-color: #00b7c3;" data-color="#00b7c3"></div>
+                    <div class="color-option" style="background-color: #e3008c;" data-color="#e3008c"></div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">پس‌زمینه</span>
+                <div class="background-options">
+                    <div class="background-option active" data-bg="none" style="background-color: var(--background-color);">
+                        <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 12px;">بدون تصویر</div>
+                    </div>
+                    <div class="background-option" data-bg="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80">
+                        <img src="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" alt="Background 1">
+                    </div>
+                    <div class="background-option" data-bg="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Background 2">
+                    </div>
+                    <div class="background-option" data-bg="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Background 3">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-title">
+                <i class="fas fa-th"></i>
+                <span>اندازه کاشی‌ها</span>
+            </div>
+            <div class="size-options">
+                <div class="size-option active" data-size="small">کوچک</div>
+                <div class="size-option" data-size="medium">متوسط</div>
+                <div class="size-option" data-size="wide">عریض</div>
+                <div class="size-option" data-size="large">بزرگ</div>
+                <div class="size-option" data-size="extra-large">خیلی بزرگ</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-title">
+                <i class="fas fa-sliders-h"></i>
+                <span>تنظیمات سیستم</span>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">صفحه نمایش</div>
+                <div class="setting-option" id="displaySettingsBtn">تنظیمات صفحه نمایش</div>
+                <div class="setting-option" id="brightnessSettingsBtn">روشنایی</div>
+                <div class="setting-option" id="nightLightSettingsBtn">حالت شب</div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">برنامه‌ها</div>
+                <div class="setting-option" id="appsSettingsBtn">مدیریت برنامه‌ها</div>
+                <div class="setting-option" id="defaultAppsSettingsBtn">برنامه‌های پیش‌فرض</div>
+                <div class="setting-option" id="offlineMapsSettingsBtn">نقشه‌های آفلاین</div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">حریم خصوصی</div>
+                <div class="setting-option" id="privacySettingsBtn">تنظیمات حریم خصوصی</div>
+                <div class="setting-option" id="locationSettingsBtn">موقعیت مکانی</div>
+                <div class="setting-option" id="cameraSettingsBtn">دوربین</div>
+                <div class="setting-option" id="microphoneSettingsBtn">میکروفون</div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">دستگاه</div>
+                <div class="setting-option" id="storageSettingsBtn">ذخیره‌سازی</div>
+                <div class="setting-option" id="batterySettingsBtn">باتری</div>
+                <div class="setting-option" id="powerSettingsBtn">صرفه‌جویی در انرژی</div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">شبکه و اینترنت</div>
+                <div class="setting-option" id="wifiSettingsBtn">Wi-Fi</div>
+                <div class="setting-option" id="mobileDataSettingsBtn">داده تلفن همراه</div>
+                <div class="setting-option" id="hotspotSettingsBtn">هات‌اسپات</div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">شخصی‌سازی</div>
+                <div class="setting-option" id="personalizationSettingsBtn">شخصی‌سازی</div>
+                <div class="setting-option" id="colorsSettingsBtn">رنگ‌ها</div>
+                <div class="setting-option" id="lockScreenSettingsBtn">صفحه قفل</div>
+                <div class="setting-option" id="themesSettingsBtn">تم‌ها</div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">دسترسی</div>
+                <div class="setting-option" id="accessibilitySettingsBtn">قابلیت دسترسی</div>
+                <div class="setting-option" id="narratorSettingsBtn">گوینده</div>
+                <div class="setting-option" id="magnifierSettingsBtn">ذره‌بین</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-title">
+                <i class="fas fa-info-circle"></i>
+                <span>درباره</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">نام برنامه</span>
+                <span>ویندوزفون 11</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">نسخه</span>
+                <span>2.0.0</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">سازنده</span>
+                <span>حسام الدین</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">اینستاگرام</span>
+                <a href="https://www.instagram.com/hessamedien" target="_blank" style="color: var(--primary-color);">@hessamedien</a>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">ساخته شده با</span>
+                <span>HTML, CSS, JavaScript</span>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <div class="settings-title">
+                <i class="fas fa-question-circle"></i>
+                <span>راهنما</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">برای تغییر اندازه کاشی‌ها</span>
+                <span>کلیک طولانی کنید</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">برای جابجایی کاشی‌ها</span>
+                <span>آنها را بکشید و رها کنید</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">برای باز کردن برنامه</span>
+                <span>روی کاشی کلیک کنید</span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">برای بستن برنامه</span>
+                <span>از دکمه بازگشت استفاده کنید</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نوتیفیکیشن -->
+    <div class="notification" id="notification">
+        <i class="fas fa-bell notification-icon"></i>
+        <div class="notification-content">
+            <div class="notification-title">خوش آمدید</div>
+            <div class="notification-message">ویندوزفون 11 آماده استفاده است</div>
+        </div>
+    </div>
+
+    <script>
+        // داده‌های برنامه
+        const apps = [
+            { id: 'clock', title: 'ساعت', icon: '🕒', type: 'app', size: 'medium', color: '#0078d4', live: true },
+            { id: 'calendar', title: 'تقویم', icon: '📅', type: 'app', size: 'medium', color: '#107c10', live: true },
+            { id: 'weather', title: 'آب و هوا', icon: '🌤️', type: 'app', size: 'small', color: '#0078d4', live: true },
+            { id: 'news', title: 'اخبار', icon: '📰', type: 'app', size: 'wide', color: '#e81123', live: true },
+            { id: 'gallery', title: 'گالری', icon: '🖼️', type: 'app', size: 'small', color: '#ffb900' },
+            { id: 'calculator', title: 'ماشین حساب', icon: '🧮', type: 'app', size: 'small', color: '#744da9' },
+            { id: 'settings', title: 'تنظیمات', icon: '⚙️', type: 'app', size: 'small', color: '#666666' },
+            { id: 'battery', title: 'باتری', icon: '🔋', type: 'app', size: 'small', color: '#107c10', live: true },
+            { id: 'store', title: 'فروشگاه', icon: '🏪', type: 'app', size: 'small', color: '#0078d4' },
+            { id: 'camera', title: 'دوربین', icon: '📷', type: 'app', size: 'small', color: '#0078d4' },
+            { id: 'photos', title: 'عکس‌ها', icon: '🖼️', type: 'app', size: 'small', color: '#e3008c' },
+            { id: 'music', title: 'موسیقی', icon: '🎵', type: 'app', size: 'small', color: '#744da9' },
+            { id: 'maps', title: 'نقشه', icon: '🗺️', type: 'app', size: 'small', color: '#107c10' },
+            { id: 'people', title: 'مخاطبین', icon: '👥', type: 'app', size: 'small', color: '#0078d4' },
+            { id: 'messaging', title: 'پیام‌ها', icon: '💬', type: 'app', size: 'small', color: '#00b7c3' },
+            { id: 'phone', title: 'تلفن', icon: '📞', type: 'app', size: 'small', color: '#107c10' },
+            { id: 'internetExplorer', title: 'اینترنت اکسپلورر', icon: '🌐', type: 'app', size: 'small', color: '#0078d4' },
+            { id: 'office', title: 'آفیس', icon: '📊', type: 'app', size: 'small', color: '#e81123' },
+            { id: 'xbox', title: 'ایکسباکس', icon: '🎮', type: 'app', size: 'small', color: '#107c10' },
+            { id: 'instagram', title: 'اینستاگرام', icon: '📷', type: 'webapp', size: 'small', color: '#E1306C', url: 'https://www.instagram.com' },
+            { id: 'telegram', title: 'تلگرام', icon: '✈️', type: 'webapp', size: 'small', color: '#0088cc', url: 'https://web.telegram.org' },
+            { id: 'whatsapp', title: 'واتساپ', icon: '💬', type: 'webapp', size: 'small', color: '#25D366', url: 'https://web.whatsapp.com' },
+            { id: 'twitter', title: 'توییتر', icon: '🐦', type: 'webapp', size: 'small', color: '#1DA1F2', url: 'https://twitter.com' },
+            { id: 'facebook', title: 'فیسبوک', icon: '👥', type: 'webapp', size: 'small', color: '#1877F2', url: 'https://www.facebook.com' },
+            { id: 'youtube', title: 'یوتیوب', icon: '📺', type: 'webapp', size: 'small', color: '#FF0000', url: 'https://www.youtube.com' },
+            { id: 'gmail', title: 'جیمیل', icon: '📧', type: 'webapp', size: 'small', color: '#EA4335', url: 'https://mail.google.com' },
+            { id: 'googleMaps', title: 'گوگل مپ', icon: '🗺️', type: 'webapp', size: 'small', color: '#4285F4', url: 'https://www.google.com/maps' },
+            { id: 'drive', title: 'گوگل درایو', icon: '📁', type: 'webapp', size: 'small', color: '#34A853', url: 'https://drive.google.com' },
+            { id: 'snapp', title: 'اسنپ', icon: '🚗', type: 'webapp', size: 'small', color: '#00C569', url: 'https://snapp.ir' },
+            { id: 'digikala', title: 'دیجی‌کالا', icon: '🛒', type: 'webapp', size: 'small', color: '#B9005C', url: 'https://www.digikala.com' },
+            { id: 'divar', title: 'دیوار', icon: '🏠', type: 'webapp', size: 'small', color: '#FF5722', url: 'https://divar.ir' },
+            { id: 'sheypoor', title: 'شیپور', icon: '💰', type: 'webapp', size: 'small', color: '#00A0E3', url: 'https://www.sheypoor.com' },
+            { id: 'bamilo', title: 'بامیلو', icon: '📦', type: 'webapp', size: 'small', color: '#FF6D00', url: 'https://www.bamilo.com' },
+            { id: 'takhfifan', title: 'تخفیفان', icon: '🎁', type: 'webapp', size: 'small', color: '#F44336', url: 'https://www.takhfifan.com' },
+            { id: 'ap', title: 'آپ', icon: '📱', type: 'webapp', size: 'small', color: '#00BCD4', url: 'https://www.irancell.ir' },
+            { id: 'filmnet', title: 'فیلمنت', icon: '🎬', type: 'webapp', size: 'small', color: '#FF4081', url: 'https://www.filmnet.ir' },
+            { id: 'namava', title: 'نماوا', icon: '🎭', type: 'webapp', size: 'small', color: '#00BFA5', url: 'https://www.namava.ir' },
+            { id: 'tapsi', title: 'تپسی', icon: '🚕', type: 'webapp', size: 'small', color: '#FF6D00', url: 'https://tapsi.ir' },
+            { id: 'alibaba', title: 'دیجی‌کالا جت', icon: '🚀', type: 'webapp', size: 'small', color: '#FF5722', url: 'https://jet.digikala.com' },
+            { id: 'torob', title: 'ترب', icon: '🔍', type: 'webapp', size: 'small', color: '#4285F4', url: 'https://torob.com' }
+        ];
+
+        const newsItems = [
+            { title: 'پیشرفت جدید در فناوری هوش مصنوعی', source: 'خبرگزاری مهر' },
+            { title: 'رونمایی از جدیدترین محصولات اپل', source: 'خبرگزاری فارس' },
+            { title: 'تحولات بازار ارز دیجیتال', source: 'اقتصاد آنلاین' },
+            { title: 'کشف جدید در زمینه پزشکی', source: 'ایسنا' },
+            { title: 'برگزاری نمایشگاه بین‌المللی فناوری', source: 'تسنیم' },
+            { title: 'تغییرات آب و هوایی و تاثیر آن بر اقتصاد', source: 'ایرنا' },
+            { title: 'پیش‌بینی وضعیت بورس در هفته آینده', source: 'دنیای اقتصاد' },
+            { title: 'رونمایی از جدیدترین گوشی سامسونگ', source: 'دیجیاتو' },
+            { title: 'Microsoft announces new features for Windows 11', source: 'The Verge' },
+            { title: 'Apple releases iOS 17 with major updates', source: 'TechCrunch' },
+            { title: 'Google unveils new AI-powered search features', source: 'CNET' },
+            { title: 'Tesla launches new electric vehicle model', source: 'Reuters' }
+        ];
+
+        // وضعیت برنامه
+        let state = {
+            currentApp: null,
+            currentTileSize: 'small',
+            darkMode: false,
+            themeColor: '#0078d4',
+            backgroundImage: 'none',
+            history: [],
+            currentPage: 1,
+            itemsPerPage: 20,
+            searchQuery: '',
+            appsOrder: apps.map(app => app.id)
+        };
+
+        // تابع نمایش نوتیفیکیشن
+        function showNotification(title, message, duration = 3000) {
+            const notification = document.getElementById('notification');
+            const notificationTitle = notification.querySelector('.notification-title');
+            const notificationMessage = notification.querySelector('.notification-message');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        // تابع تبدیل تاریخ میلادی به شمسی
+        function toPersianDate(date) {
+            const gregorian = new Date(date);
+            const gYear = gregorian.getFullYear();
+            const gMonth = gregorian.getMonth() + 1;
+            const gDay = gregorian.getDate();
+            
+            // الگوریتم ساده برای تبدیل تاریخ (برای دقت بیشتر باید از کتابخانه استفاده شود)
+            const persianDate = new Date(gregorian.getTime() + (3 * 60 + 30) * 60 * 1000);
+            const pYear = gYear - 621;
+            const pMonth = gMonth <= 6 ? gMonth + 6 : gMonth - 6;
+            const pDay = gDay;
+            
+            const monthNames = [
+                'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+                'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+            ];
+            
+            return {
+                year: pYear,
+                month: pMonth,
+                day: pDay,
+                monthName: monthNames[pMonth - 1],
+                weekday: gregorian.toLocaleDateString('fa-IR', { weekday: 'long' })
+            };
+        }
+
+        // تابع به روزرسانی زمان
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fa-IR');
+            document.getElementById('timeDisplay').textContent = timeString;
+            
+            // به روزرسانی کاشی ساعت
+            const clockTile = document.getElementById('clockTile');
+            if (clockTile) {
+                const clockContent = clockTile.querySelector('.tile-content');
+                clockContent.innerHTML = `
+                    <div style="font-size: 24px; font-weight: bold;">${now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div style="font-size: 14px; margin-top: 5px;">${now.toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                `;
+            }
+            
+            // به روزرسانی کاشی تقویم
+            const calendarTile = document.getElementById('calendarTile');
+            if (calendarTile) {
+                const persianDate = toPersianDate(now);
+                const calendarContent = calendarTile.querySelector('.tile-content');
+                calendarContent.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">${persianDate.weekday}</div>
+                    <div style="font-size: 32px; font-weight: bold;">${persianDate.day}</div>
+                    <div style="font-size: 14px; margin-top: 5px;">${persianDate.monthName} ${persianDate.year}</div>
+                `;
+            }
+            
+            // به روزرسانی کاشی آب و هوا (نمونه)
+            const weatherTile = document.getElementById('weatherTile');
+            if (weatherTile) {
+                const weatherContent = weatherTile.querySelector('.tile-content');
+                const temp = Math.floor(Math.random() * 15) + 15; // دمای تصادفی بین 15 تا 30
+                weatherContent.innerHTML = `
+                    <div style="font-size: 32px; font-weight: bold;">${temp}°C</div>
+                    <div style="font-size: 14px; margin-top: 5px;">تهران، آفتابی</div>
+                `;
+            }
+            
+            // به روزرسانی کاشی باتری
+            const batteryTile = document.getElementById('batteryTile');
+            if (batteryTile) {
+                const batteryContent = batteryTile.querySelector('.tile-content');
+                const batteryLevel = document.getElementById('batteryLevel');
+                const batteryPercent = document.getElementById('batteryPercent');
+                
+                // شبیه‌سازی تغییر سطح باتری
+                let level = parseInt(batteryLevel.style.width || '85%');
+                if (level > 20) level -= 1;
+                if (level < 20) level = 85; // شارژ مجدد
+                
+                batteryLevel.style.width = `${level}%`;
+                batteryPercent.textContent = `${level}%`;
+                
+                batteryContent.innerHTML = `
+                    <div style="font-size: 32px; margin-bottom: 10px;">🔋</div>
+                    <div style="font-size: 24px; font-weight: bold;">${level}%</div>
+                    <div style="font-size: 12px; margin-top: 5px;">${level > 20 ? 'در حال استفاده' : 'نیاز به شارژ'}</div>
+                `;
+                
+                // تغییر رنگ باتری بر اساس سطح
+                if (level > 70) {
+                    batteryLevel.style.backgroundColor = 'var(--success-color)';
+                } else if (level > 30) {
+                    batteryLevel.style.backgroundColor = 'var(--warning-color)';
+                } else {
+                    batteryLevel.style.backgroundColor = 'var(--error-color)';
+                }
+            }
+        }
+
+        // تابع ایجاد کاشی‌ها
+        function createTiles() {
+            const container = document.getElementById('tilesContainer');
+            const pagination = document.getElementById('pagination');
+            container.innerHTML = '';
+            pagination.innerHTML = '';
+            
+            // فیلتر کردن برنامه‌ها بر اساس جستجو
+            const filteredApps = apps.filter(app => 
+                app.title.includes(state.searchQuery) || 
+                app.id.includes(state.searchQuery)
+            );
+            
+            // مرتب‌سازی بر اساس ترتیب ذخیره شده
+            const sortedApps = [...filteredApps].sort((a, b) => {
+                return state.appsOrder.indexOf(a.id) - state.appsOrder.indexOf(b.id);
+            });
+            
+            // محاسبه تعداد صفحات
+            const totalPages = Math.ceil(sortedApps.length / state.itemsPerPage);
+            
+            // ایجاد صفحه‌بندی
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${i === state.currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        state.currentPage = i;
+                        createTiles();
+                    });
+                    pagination.appendChild(pageBtn);
+                }
+            }
+            
+            // محاسبه شروع و پایان برنامه‌های صفحه فعلی
+            const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+            const endIndex = startIndex + state.itemsPerPage;
+            const currentPageApps = sortedApps.slice(startIndex, endIndex);
+            
+            if (currentPageApps.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-search"></i>
+                        <h3>برنامه‌ای یافت نشد</h3>
+                        <p>هیچ برنامه‌ای با عبارت "${state.searchQuery}" پیدا نشد</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentPageApps.forEach(app => {
+                const tile = document.createElement('div');
+                tile.id = `${app.id}Tile`;
+                tile.className = `tile ${app.size} ${app.live ? 'live-tile' : ''}`;
+                tile.style.backgroundColor = app.color;
+                tile.style.color = 'white';
+                tile.draggable = true;
+                tile.dataset.appId = app.id;
+                
+                tile.innerHTML = `
+                    <div class="tile-content">
+                        <div class="tile-icon">${app.icon}</div>
+                        <div class="tile-title">${app.title}</div>
+                    </div>
+                    <div class="resize-handle">⤢</div>
+                `;
+                
+                tile.addEventListener('click', () => openApp(app));
+                
+                // افزودن قابلیت تغییر اندازه با کلیک طولانی
+                let longPressTimer;
+                tile.addEventListener('mousedown', (e) => {
+                    longPressTimer = setTimeout(() => {
+                        showResizeOptions(tile, app);
+                    }, 1000);
+                });
+                
+                tile.addEventListener('mouseup', () => {
+                    clearTimeout(longPressTimer);
+                });
+                
+                tile.addEventListener('mouseleave', () => {
+                    clearTimeout(longPressTimer);
+                });
+                
+                // افزودن قابلیت Drag & Drop
+                tile.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', app.id);
+                    tile.classList.add('dragging');
+                });
+                
+                tile.addEventListener('dragend', () => {
+                    tile.classList.remove('dragging');
+                });
+                
+                container.appendChild(tile);
+            });
+            
+            // افزودن قابلیت Drop برای جابجایی کاشی‌ها
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const draggedAppId = e.dataTransfer.getData('text/plain');
+                const targetAppId = e.target.closest('.tile')?.dataset.appId;
+                
+                if (targetAppId && draggedAppId !== targetAppId) {
+                    // جابجایی موقعیت برنامه‌ها در آرایه
+                    const draggedIndex = state.appsOrder.indexOf(draggedAppId);
+                    const targetIndex = state.appsOrder.indexOf(targetAppId);
+                    
+                    state.appsOrder.splice(draggedIndex, 1);
+                    state.appsOrder.splice(targetIndex, 0, draggedAppId);
+                    
+                    saveSettings();
+                    createTiles();
+                    showNotification('تغییرات ذخیره شد', 'ترتیب کاشی‌ها به روز شد');
+                }
+            });
+        }
+
+        // تابع نمایش گزینه‌های تغییر اندازه
+        function showResizeOptions(tile, app) {
+            const sizes = ['small', 'medium', 'wide', 'large', 'extra-large'];
+            const menu = document.createElement('div');
+            menu.style.position = 'absolute';
+            menu.style.backgroundColor = 'white';
+            menu.style.borderRadius = '5px';
+            menu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            menu.style.padding = '10px';
+            menu.style.zIndex = '100';
+            menu.style.color = 'black';
+            
+            sizes.forEach(size => {
+                const option = document.createElement('div');
+                option.textContent = size === 'small' ? 'کوچک' : 
+                                   size === 'medium' ? 'متوسط' : 
+                                   size === 'wide' ? 'عریض' : 
+                                   size === 'large' ? 'بزرگ' : 'خیلی بزرگ';
+                option.style.padding = '5px 10px';
+                option.style.cursor = 'pointer';
+                option.style.transition = 'background-color 0.2s';
+                option.addEventListener('mouseenter', () => {
+                    option.style.backgroundColor = '#f0f0f0';
+                });
+                option.addEventListener('mouseleave', () => {
+                    option.style.backgroundColor = 'transparent';
+                });
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    changeTileSize(tile, app, size);
+                    document.body.removeChild(menu);
+                });
+                menu.appendChild(option);
+            });
+            
+            const rect = tile.getBoundingClientRect();
+            menu.style.top = `${rect.top}px`;
+            menu.style.left = `${rect.left}px`;
+            
+            document.body.appendChild(menu);
+            
+            // بستن منو با کلیک خارج از آن
+            const closeMenu = (e) => {
+                if (!menu.contains(e.target)) {
+                    document.body.removeChild(menu);
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', closeMenu);
+            }, 0);
+        }
+
+        // تابع تغییر اندازه کاشی
+        function changeTileSize(tile, app, newSize) {
+            // حذف کلاس‌های اندازه قبلی
+            const sizeClasses = ['small', 'medium', 'wide', 'large', 'extra-large'];
+            sizeClasses.forEach(cls => tile.classList.remove(cls));
+            
+            // افزودن کلاس اندازه جدید
+            tile.classList.add(newSize);
+            app.size = newSize;
+            
+            // ذخیره تنظیمات در localStorage
+            saveSettings();
+            showNotification('اندازه تغییر کرد', `اندازه کاشی "${app.title}" تغییر کرد`);
+        }
+
+        // تابع باز کردن برنامه
+        function openApp(app) {
+            state.currentApp = app;
+            state.history.push(app);
+            
+            const modal = document.getElementById('appModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.innerHTML = `<i class="fas fa-${getAppIcon(app.id)}"></i><span>${app.title}</span>`;
+            
+            if (app.type === 'webapp') {
+                modalBody.innerHTML = `<iframe class="webapp-frame" src="${app.url}"></iframe>`;
+            } else {
+                switch (app.id) {
+                    case 'clock':
+                        modalBody.innerHTML = `
+                            <div style="text-align: center; padding: 20px;">
+                                <div style="font-size: 48px; font-weight: bold; margin-bottom: 20px;" id="modalClock">${new Date().toLocaleTimeString('fa-IR')}</div>
+                                <div style="font-size: 24px;" id="modalDate">${new Date().toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+                                    <button class="nav-btn" id="stopwatchBtn">کرنومتر</button>
+                                    <button class="nav-btn" id="timerBtn">تایمر</button>
+                                    <button class="nav-btn" id="worldClockBtn">ساعت جهانی</button>
+                                </div>
+                                <div id="stopwatchContainer" style="display: none; margin-top: 20px;">
+                                    <div style="font-size: 36px; font-weight: bold;" id="stopwatchDisplay">00:00:00</div>
+                                    <div style="margin-top: 15px;">
+                                        <button class="nav-btn" id="startStopwatch">شروع</button>
+                                        <button class="nav-btn" id="resetStopwatch">ریست</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // افزودن عملکرد کرنومتر
+                        document.getElementById('stopwatchBtn').addEventListener('click', () => {
+                            document.getElementById('stopwatchContainer').style.display = 'block';
+                        });
+                        
+                        let stopwatchInterval;
+                        let stopwatchTime = 0;
+                        let stopwatchRunning = false;
+                        
+                        document.getElementById('startStopwatch').addEventListener('click', () => {
+                            if (!stopwatchRunning) {
+                                stopwatchRunning = true;
+                                document.getElementById('startStopwatch').textContent = 'توقف';
+                                stopwatchInterval = setInterval(() => {
+                                    stopwatchTime++;
+                                    updateStopwatchDisplay();
+                                }, 1000);
+                            } else {
+                                stopwatchRunning = false;
+                                document.getElementById('startStopwatch').textContent = 'شروع';
+                                clearInterval(stopwatchInterval);
+                            }
+                        });
+                        
+                        document.getElementById('resetStopwatch').addEventListener('click', () => {
+                            stopwatchRunning = false;
+                            clearInterval(stopwatchInterval);
+                            stopwatchTime = 0;
+                            updateStopwatchDisplay();
+                            document.getElementById('startStopwatch').textContent = 'شروع';
+                        });
+                        
+                        function updateStopwatchDisplay() {
+                            const hours = Math.floor(stopwatchTime / 3600);
+                            const minutes = Math.floor((stopwatchTime % 3600) / 60);
+                            const seconds = stopwatchTime % 60;
+                            
+                            document.getElementById('stopwatchDisplay').textContent = 
+                                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        }
+                        break;
+                    case 'calendar':
+                        const persianDate = toPersianDate(new Date());
+                        modalBody.innerHTML = `
+                            <div style="text-align: center; padding: 20px;">
+                                <div style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">${persianDate.weekday} ${persianDate.day} ${persianDate.monthName} ${persianDate.year}</div>
+                                <div class="calendar">
+                                    <div class="calendar-header">${persianDate.monthName} ${persianDate.year}</div>
+                                    <div class="calendar-weekday">ش</div>
+                                    <div class="calendar-weekday">ی</div>
+                                    <div class="calendar-weekday">د</div>
+                                    <div class="calendar-weekday">س</div>
+                                    <div class="calendar-weekday">چ</div>
+                                    <div class="calendar-weekday">پ</div>
+                                    <div class="calendar-weekday">ج</div>
+                                    ${generateCalendarDays(persianDate.year, persianDate.month)}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'news':
+                        modalBody.innerHTML = `
+                            <div class="news-feed">
+                                ${newsItems.map(item => `
+                                    <div class="news-item">
+                                        <div class="news-title">${item.title}</div>
+                                        <div class="news-source">${item.source}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        break;
+                    case 'gallery':
+                        modalBody.innerHTML = `
+                            <div class="gallery">
+                                ${Array.from({length: 12}, (_, i) => `
+                                    <div class="gallery-item">
+                                        <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background-color: ${getRandomColor()}; color: white; font-size: 24px; border-radius: 10px;">
+                                            تصویر ${i+1}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        break;
+                    case 'battery':
+                        const batteryLevel = document.getElementById('batteryLevel').style.width || '85%';
+                        modalBody.innerHTML = `
+                            <div style="padding: 20px; text-align: center;">
+                                <div style="font-size: 64px; margin-bottom: 20px;">🔋</div>
+                                <div style="font-size: 36px; font-weight: bold; margin-bottom: 10px;">${batteryLevel}</div>
+                                <div style="font-size: 18px; margin-bottom: 30px;">سطح باتری</div>
+                                <div style="background-color: var(--background-color); height: 20px; border-radius: 10px; overflow: hidden; margin: 0 auto 20px; max-width: 300px;">
+                                    <div style="height: 100%; background-color: var(--success-color); width: ${batteryLevel};"></div>
+                                </div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">
+                                    ${parseInt(batteryLevel) > 70 ? 'باتری شما در وضعیت خوبی است' : 
+                                      parseInt(batteryLevel) > 30 ? 'باتری شما در وضعیت متوسط است' : 
+                                      'باتری شما نیاز به شارژ دارد'}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'settings':
+                        modalBody.innerHTML = `
+                            <div style="padding: 20px;">
+                                <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-cog"></i>
+                                    <span>تنظیمات سیستم</span>
+                                </h2>
+                                <div class="settings-section">
+                                    <div class="settings-title">شخصی‌سازی</div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">تم</span>
+                                        <button class="nav-btn" id="themeSettingsBtn">تنظیمات</button>
+                                    </div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">زمینه</span>
+                                        <button class="nav-btn" id="backgroundSettingsBtn">تغییر</button>
+                                    </div>
+                                </div>
+                                <div class="settings-section">
+                                    <div class="settings-title">دستگاه</div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">صفحه نمایش</span>
+                                        <button class="nav-btn" id="displaySettingsBtn">تنظیمات</button>
+                                    </div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">باتری</span>
+                                        <span>${document.getElementById('batteryPercent').textContent}</span>
+                                    </div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">ذخیره‌سازی</span>
+                                        <span>۶۴ گیگابایت از ۱۲۸ گیگابایت استفاده شده</span>
+                                    </div>
+                                </div>
+                                <div class="settings-section">
+                                    <div class="settings-title">درباره</div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">نام دستگاه</span>
+                                        <span>ویندوزفون 11</span>
+                                    </div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">سازنده</span>
+                                        <span>حسام الدین</span>
+                                    </div>
+                                    <div class="setting-item">
+                                        <span class="setting-label">اینستاگرام</span>
+                                        <a href="https://www.instagram.com/hessamedien" target="_blank" style="color: var(--primary-color);">@hessamedien</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        modalBody.innerHTML = `
+                            <div style="text-align: center; padding: 50px;">
+                                <div style="font-size: 64px; margin-bottom: 20px;">${app.icon}</div>
+                                <h2>${app.title}</h2>
+                                <p style="margin-top: 20px;">این برنامه در حال توسعه است</p>
+                            </div>
+                        `;
+                }
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // تابع دریافت آیکون مناسب برای برنامه
+        function getAppIcon(appId) {
+            const iconMap = {
+                'clock': 'clock',
+                'calendar': 'calendar',
+                'weather': 'cloud-sun',
+                'news': 'newspaper',
+                'gallery': 'images',
+                'calculator': 'calculator',
+                'settings': 'cog',
+                'battery': 'battery-half',
+                'store': 'store',
+                'camera': 'camera',
+                'photos': 'images',
+                'music': 'music',
+                'maps': 'map',
+                'people': 'users',
+                'messaging': 'comments',
+                'phone': 'phone',
+                'internetExplorer': 'globe',
+                'office': 'file-alt',
+                'xbox': 'gamepad',
+                'instagram': 'camera',
+                'telegram': 'paper-plane',
+                'whatsapp': 'comment',
+                'twitter': 'dove',
+                'facebook': 'users',
+                'youtube': 'tv',
+                'gmail': 'envelope',
+                'googleMaps': 'map',
+                'drive': 'folder',
+                'snapp': 'car',
+                'digikala': 'shopping-cart',
+                'divar': 'home',
+                'sheypoor': 'money-bill-wave',
+                'bamilo': 'box',
+                'takhfifan': 'gift',
+                'ap': 'mobile-alt',
+                'filmnet': 'film',
+                'namava': 'theater-masks',
+                'tapsi': 'taxi',
+                'alibaba': 'rocket',
+                'torob': 'search'
+            };
+            
+            return iconMap[appId] || 'mobile-alt';
+        }
+
+        // تابع تولید روزهای تقویم
+        function generateCalendarDays(year, month) {
+            // این یک نمونه ساده است - برای پیاده‌سازی کامل نیاز به الگوریتم دقیق داریم
+            let days = '';
+            const daysInMonth = month <= 6 ? 31 : 30;
+            const today = toPersianDate(new Date());
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const isToday = i === today.day && month === today.month && year === today.year;
+                days += `<div class="calendar-day ${isToday ? 'today' : ''}">${i}</div>`;
+            }
+            
+            return days;
+        }
+
+        // تابع تولید رنگ تصادفی
+        function getRandomColor() {
+            const colors = ['#0078d4', '#e81123', '#107c10', '#ffb900', '#744da9', '#00b7c3', '#ff8c00'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // تابع ذخیره تنظیمات
+        function saveSettings() {
+            localStorage.setItem('wp11Settings', JSON.stringify(state));
+        }
+
+        // تابع بارگذاری تنظیمات
+        function loadSettings() {
+            const saved = localStorage.getItem('wp11Settings');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                state = { ...state, ...savedState };
+                
+                // اعمال تنظیمات بارگذاری شده
+                if (state.darkMode) {
+                    document.body.classList.add('dark-theme');
+                    document.getElementById('darkModeToggle').checked = true;
+                }
+                
+                if (state.themeColor) {
+                    document.documentElement.style.setProperty('--primary-color', state.themeColor);
+                    
+                    // فعال کردن رنگ انتخاب شده در پنل تنظیمات
+                    document.querySelectorAll('.color-option').forEach(option => {
+                        if (option.getAttribute('data-color') === state.themeColor) {
+                            option.classList.add('active');
+                        } else {
+                            option.classList.remove('active');
+                        }
+                    });
+                }
+                
+                if (state.backgroundImage) {
+                    document.documentElement.style.setProperty('--background-image', `url(${state.backgroundImage})`);
+                    
+                    // فعال کردن پس‌زمینه انتخاب شده در پنل تنظیمات
+                    document.querySelectorAll('.background-option').forEach(option => {
+                        if (option.getAttribute('data-bg') === state.backgroundImage) {
+                            option.classList.add('active');
+                        } else {
+                            option.classList.remove('active');
+                        }
+                    });
+                }
+                
+                // اعمال اندازه کاشی انتخاب شده
+                document.querySelectorAll('.size-option').forEach(option => {
+                    if (option.getAttribute('data-size') === state.currentTileSize) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // راه‌اندازی برنامه
+        document.addEventListener('DOMContentLoaded', () => {
+            // بارگذاری تنظیمات
+            loadSettings();
+            
+            // ایجاد کاشی‌ها
+            createTiles();
+            
+            // به روزرسانی زمان
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // نمایش نوتیفیکیشن خوش آمدگویی
+            setTimeout(() => {
+                showNotification('خوش آمدید', 'ویندوزفون 11 آماده استفاده است');
+            }, 1000);
+            
+            // رویدادهای دکمه‌های ناوبری
+            document.getElementById('homeBtn').addEventListener('click', () => {
+                document.getElementById('appModal').style.display = 'none';
+                document.getElementById('settingsPanel').style.display = 'none';
+                state.currentApp = null;
+            });
+            
+            document.getElementById('backBtn').addEventListener('click', () => {
+                if (state.history.length > 1) {
+                    state.history.pop(); // حذف برنامه فعلی
+                    const prevApp = state.history.pop(); // بازیابی برنامه قبلی
+                    if (prevApp) openApp(prevApp);
+                } else {
+                    document.getElementById('appModal').style.display = 'none';
+                    state.currentApp = null;
+                }
+            });
+            
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                document.getElementById('searchInput').focus();
+            });
+            
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                document.getElementById('settingsPanel').style.display = 'block';
+            });
+            
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('appModal').style.display = 'none';
+                state.currentApp = null;
+            });
+            
+            // رویداد جستجو
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                state.currentPage = 1;
+                createTiles();
+            });
+            
+            // رویدادهای تنظیمات
+            document.getElementById('darkModeToggle').addEventListener('change', (e) => {
+                state.darkMode = e.target.checked;
+                if (state.darkMode) {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                }
+                saveSettings();
+                showNotification('حالت تاریک', state.darkMode ? 'فعال شد' : 'غیرفعال شد');
+            });
+            
+            // رویدادهای انتخاب رنگ
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    state.themeColor = option.getAttribute('data-color');
+                    document.documentElement.style.setProperty('--primary-color', state.themeColor);
+                    saveSettings();
+                    showNotification('رنگ تم', 'تغییر کرد');
+                });
+            });
+            
+            // رویدادهای انتخاب پس‌زمینه
+            document.querySelectorAll('.background-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.background-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    state.backgroundImage = option.getAttribute('data-bg');
+                    document.documentElement.style.setProperty('--background-image', state.backgroundImage === 'none' ? 'none' : `url(${state.backgroundImage})`);
+                    saveSettings();
+                    showNotification('پس‌زمینه', 'تغییر کرد');
+                });
+            });
+            
+            // رویدادهای انتخاب اندازه
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    state.currentTileSize = option.getAttribute('data-size');
+                    saveSettings();
+                    showNotification('اندازه کاشی‌ها', 'تغییر کرد');
+                });
+            });
+            
+            // رویدادهای تنظیمات سیستم
+            document.querySelectorAll('.setting-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    showNotification('تنظیمات', `${option.textContent} باز شد`);
+                });
+            });
+            
+            // بستن پنل تنظیمات با کلیک خارج از آن
+            document.addEventListener('click', (e) => {
+                const settingsPanel = document.getElementById('settingsPanel');
+                if (settingsPanel.style.display === 'block' && !settingsPanel.contains(e.target) && e.target.id !== 'settingsBtn') {
+                    settingsPanel.style.display = 'none';
+                }
+            });
+            
+            // بستن مودال با کلید Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('appModal').style.display = 'none';
+                    document.getElementById('settingsPanel').style.display = 'none';
+                    state.currentApp = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
