@@ -96,7 +96,7 @@ This software is a **fan-created simulation** and has **NO COMMERCIAL VALUE**. I
 
 ## 👨‍💻 Developer
 
-**Created by: Hessam Edien**  
+**Created by: Hessamedien**  
 **GitHub:** [Hessamedien](https://github.com/Hessamedien)  
 **Instagram:** [@hessamedien](https://instagram.com/hessamedien)
 
