@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebOS 11 Simulator</title>
+    <style>
+        /* Global Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+
+        /* Desktop */
+        #desktop {
+            height: 100vh;
+            background: linear-gradient(135deg, #2a3c66 0%, #0e1a2b 100%);
+            background-size: cover;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Taskbar */
+        #taskbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 48px;
+            background-color: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+        #start-button {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #start-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+        #taskbar-apps { display: flex; }
+        .taskbar-app { padding: 10px; color: #ccc; cursor: pointer; }
+        .taskbar-app:hover { background-color: rgba(255, 255, 255, 0.05); }
+        #system-tray { margin-left: auto; display: flex; align-items: center; color: white; }
+
+        /* Start Menu */
+        #start-menu {
+            position: fixed;
+            bottom: 50px;
+            left: 10px;
+            width: 400px;
+            height: 550px;
+            background-color: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            z-index: 999;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        #start-menu-header { padding: 20px; color: white; font-size: 16px; }
+        #app-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+        }
+        .app-icon:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .app-icon img { width: 40px; height: 40px; margin-bottom: 8px; }
+
+        /* Window */
+        .window {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            width: 800px;
+            height: 500px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.35);
+            z-index: 100;
+            overflow: hidden;
+        }
+        .window-header {
+            background-color: #2a3c66;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+        .window-title { font-weight: bold; }
+        .window-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .window-minimize:hover { color: #ccc; }
+        .window-close:hover { color: #ff4444; }
+        .window-content {
+            flex-grow: 1;
+            padding: 15px;
+            overflow: auto;
+            background-color: white;
+        }
+
+        /* Browser Specific */
+        #browser-content { width: 100%; height: 100%; border: none; }
+        #url-bar { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px; }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .active-window { z-index: 101 !important; }
+    </style>
+</head>
+<body>
+    <div id="desktop">
+        <!-- Windows will be dynamically created here -->
+    </div>
+
+    <div id="taskbar">
+        <button id="start-button">Start</button>
+        <div id="taskbar-apps">
+            <!-- Taskbar pins will be added here -->
+        </div>
+        <div id="system-tray">19:24</div>
+    </div>
+
+    <div id="start-menu">
+        <div id="start-menu-header">WebOS 11 Applications</div>
+        <div id="app-grid">
+            <div class="app-icon" data-app="browser">
+                <span>🌐</span>
+                <span>Web Browser</span>
+            </div>
+            <div class="app-icon" data-app="notepad">
+                <span>📝</span>
+                <span>Notepad</span>
+            </div>
+            <div class="app-icon" data-app="explorer">
+                <span>📁</span>
+                <span>File Explorer</span>
+            </div>
+            <div class="app-icon" data-app="settings">
+                <span⚙️</span>
+                <span>Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const desktop = document.getElementById('desktop');
+        const startButton = document.getElementById('start-button');
+        const startMenu = document.getElementById('start-menu');
+        const appIcons = document.querySelectorAll('.app-icon');
+        const systemTray = document.getElementById('system-tray');
+
+        // App Templates
+        const appTemplates = {
+            browser: {
+                title: 'Web Browser',
+                content: `
+                    <div>
+                        <input type="text" id="url-bar" placeholder="https://example.com" value="https://www.bing.com/">
+                        <button onclick="navigate()">Go</button>
+                    </div>
+                    <iframe id="browser-content" src="https://www.bing.com/"></iframe>
+                `
+            },
+            notepad: {
+                title: 'Notepad',
+                content: `<textarea style="width: 100%; height: 100%; border: none; padding: 5px; resize: none;" placeholder="Start typing..."></textarea>`
+            },
+            explorer: {
+                title: 'File Explorer',
+                content: `<div style="padding: 20px; text-align: center;"><h2>Local Disk (C:)</h2><p>This is a simulated file system.</p><p>📁 Program Files</p><p>📁 Users</p><p>📁 Windows</p></div>`
+            },
+            settings: {
+                title: 'Settings',
+                content: `<div style="padding: 20px;"><h2>Settings</h2><p>Change your background:</p><button onclick="alert('Simulated setting changed!')">Change Wallpaper</button></div>`
+            }
+        };
+
+        // Toggle Start Menu
+        startButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+        document.addEventListener('click', (e) => {
+            if (!startMenu.contains(e.target) && e.target !== startButton) {
+                startMenu.style.display = 'none';
+            }
+        });
+
+        // Create and Open Applications
+        appIcons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                const appName = icon.getAttribute('data-app');
+                openApp(appName);
+                startMenu.style.display = 'none'; // Close start menu when app opens
+            });
+        });
+
+        function openApp(appName) {
+            // Create a new window div
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'window';
+            windowDiv.id = `window-${appName}`;
+            windowDiv.innerHTML = `
+                <div class="window-header">
+                    <div class="window-title">${appTemplates[appName].title}</div>
+                    <div class="window-controls">
+                        <button class="window-minimize">—</button>
+                        <button class="window-close">×</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    ${appTemplates[appName].content}
+                </div>
+            `;
+            desktop.appendChild(windowDiv);
+
+            // Make window draggable and bring to front
+            makeDraggable(windowDiv);
+            focusWindow(windowDiv);
+
+            // Add event listeners to window controls
+            const closeBtn = windowDiv.querySelector('.window-close');
+            const minBtn = windowDiv.querySelector('.window-minimize');
+            closeBtn.addEventListener('click', () => closeApp(windowDiv));
+            minBtn.addEventListener('click', () => minimizeApp(windowDiv));
+
+            // Show the window
+            windowDiv.style.display = 'flex';
+
+            // Pin app to taskbar (simplified)
+            const taskbarApp = document.createElement('div');
+            taskbarApp.className = 'taskbar-app';
+            taskbarApp.textContent = appTemplates[appName].title;
+            taskbarApp.addEventListener('click', () => focusWindow(windowDiv));
+            document.getElementById('taskbar-apps').appendChild(taskbarApp);
+        }
+
+        function closeApp(windowDiv) {
+            desktop.removeChild(windowDiv);
+        }
+
+        function minimizeApp(windowDiv) {
+            windowDiv.style.display = 'none';
+        }
+
+        function focusWindow(windowDiv) {
+            // Remove active class from all windows
+            document.querySelectorAll('.window').forEach(win => {
+                win.classList.remove('active-window');
+            });
+            // Add active class to clicked window
+            windowDiv.classList.add('active-window');
+        }
+
+        function makeDraggable(element) {
+            const header = element.querySelector('.window-header');
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = parseInt(getComputedStyle(element).left, 10) || 0;
+                initialY = parseInt(getComputedStyle(element).top, 10) || 0;
+                focusWindow(element);
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                element.style.left = `${initialX + e.clientX - startX}px`;
+                element.style.top = `${initialY + e.clientY - startY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+
+        // Browser Functionality
+        window.navigate = function() {
+            const url = document.getElementById('url-bar').value;
+            let finalUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                finalUrl = 'https://' + url;
+            }
+            document.getElementById('browser-content').src = finalUrl;
+        };
+
+        // System Clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            systemTray.textContent = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>

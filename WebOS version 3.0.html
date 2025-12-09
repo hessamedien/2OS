@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebOS 2.0 - Browser-Based Desktop Environment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* Desktop */
+        #desktop {
+            width: 100%;
+            height: calc(100% - 45px);
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><rect fill="white" width="100" height="100"/></svg>'), 
+                        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Desktop Icons */
+        .desktop-icons {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 80px);
+            gap: 20px;
+        }
+
+        .desktop-icon {
+            width: 70px;
+            text-align: center;
+            cursor: pointer;
+            padding: 10px 5px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .desktop-icon.selected {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .desktop-icon i {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .desktop-icon span {
+            font-size: 12px;
+            display: block;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Taskbar */
+        #taskbar {
+            height: 45px;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            position: relative;
+            z-index: 1000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .start-button {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .start-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .taskbar-icons {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .taskbar-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.2s;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .taskbar-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .taskbar-icon.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .taskbar-icon.active::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            right: 10px;
+            height: 2px;
+            background: #0078d4;
+        }
+
+        .system-tray {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            padding-right: 10px;
+        }
+
+        .time {
+            font-size: 12px;
+        }
+
+        /* Window */
+        .window {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            min-width: 400px;
+            min-height: 300px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            resize: both;
+        }
+
+        .window.maximized {
+            width: 100% !important;
+            height: calc(100% - 45px) !important;
+            top: 0 !important;
+            left: 0 !important;
+            border-radius: 0;
+            resize: none;
+        }
+
+        .window-header {
+            background: rgba(30, 30, 30, 0.9);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            user-select: none;
+            cursor: move;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-control {
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .window-control:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .window-control.close:hover {
+            background: #e81123;
+        }
+
+        .window-content {
+            flex: 1;
+            padding: 15px;
+            overflow: auto;
+            color: #333;
+        }
+
+        /* Start Menu */
+        #start-menu {
+            position: absolute;
+            bottom: 45px;
+            left: 10px;
+            width: 500px;
+            height: 500px;
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1001;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .start-menu-header {
+            padding: 30px;
+            background: linear-gradient(135deg, #0067c0, #00b7c3);
+            color: white;
+        }
+
+        .start-menu-apps {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .start-menu-app {
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .start-menu-app:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .start-menu-app i {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        /* Browser */
+        .browser-url-bar {
+            display: flex;
+            padding: 10px;
+            background: #f3f3f3;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .browser-url-input {
+            flex: 1;
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .browser-controls {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .browser-control {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .browser-content {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: none;
+        }
+
+        /* File Explorer */
+        .file-explorer-layout {
+            display: flex;
+            height: 100%;
+        }
+
+        .file-explorer-sidebar {
+            width: 200px;
+            background: #f8f8f8;
+            border-right: 1px solid #e1e1e1;
+            padding: 15px 0;
+        }
+
+        .file-explorer-content {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .sidebar-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-item:hover {
+            background: #e8f0fe;
+        }
+
+        .sidebar-item.active {
+            background: #e3f2fd;
+            color: #1a73e8;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .file-item {
+            text-align: center;
+            padding: 15px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .file-item:hover {
+            background: #f1f3f4;
+        }
+
+        .file-item.selected {
+            background: #e3f2fd;
+        }
+
+        .file-item i {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+            color: #5f6368;
+        }
+
+        .file-path {
+            padding: 10px 15px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #e1e1e1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-path input {
+            flex: 1;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Settings */
+        .settings-layout {
+            display: flex;
+            height: 100%;
+        }
+
+        .settings-sidebar {
+            width: 200px;
+            background: #f8f8f8;
+            border-right: 1px solid #e1e1e1;
+            padding: 15px 0;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .settings-category {
+            margin-bottom: 25px;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #1f1f1f;
+        }
+
+        .settings-option {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .settings-option label {
+            flex: 1;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #0078d4;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Calculator */
+        .calculator {
+            width: 300px;
+        }
+
+        .calculator-display {
+            background: #1e1e1e;
+            color: white;
+            padding: 20px;
+            text-align: right;
+            font-size: 24px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-btn {
+            padding: 15px;
+            background: #f1f3f4;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: #e8eaed;
+        }
+
+        .calc-btn.operator {
+            background: #dadce0;
+        }
+
+        .calc-btn.equals {
+            background: #4285f4;
+            color: white;
+        }
+
+        /* Notepad */
+        .notepad-textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            padding: 10px;
+            outline: none;
+        }
+
+        .notepad-menu {
+            display: flex;
+            padding: 5px 10px;
+            background: #f3f3f3;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .notepad-menu-item {
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .notepad-menu-item:hover {
+            background: #e8eaed;
+        }
+
+        /* Media Player */
+        .media-player {
+            width: 500px;
+        }
+
+        .media-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f3f3f3;
+        }
+
+        .media-control {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4285f4;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .media-progress {
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .media-progress-bar {
+            position: absolute;
+            height: 100%;
+            background: #4285f4;
+            width: 30%;
+        }
+
+        /* Terminal */
+        .terminal {
+            background: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Consolas', monospace;
+            height: 100%;
+            padding: 15px;
+            overflow: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 5px;
+        }
+
+        .terminal-prompt {
+            color: #4285f4;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            outline: none;
+            width: 80%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .window {
+                width: 95% !important;
+                height: 70% !important;
+                left: 2.5% !important;
+                top: 15% !important;
+            }
+            
+            #start-menu {
+                width: 95%;
+                left: 2.5%;
+            }
+            
+            .start-menu-apps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Context Menu */
+        #context-menu {
+            position: absolute;
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 8px 0;
+            display: none;
+            z-index: 1002;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .context-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .context-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1003;
+            max-width: 300px;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Window Resize Handles */
+        .window-resize-handle {
+            position: absolute;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .window-resize-handle.n {
+            top: 0;
+            left: 5px;
+            right: 5px;
+            height: 5px;
+            cursor: n-resize;
+        }
+
+        .window-resize-handle.e {
+            top: 5px;
+            right: 0;
+            bottom: 5px;
+            width: 5px;
+            cursor: e-resize;
+        }
+
+        .window-resize-handle.s {
+            bottom: 0;
+            left: 5px;
+            right: 5px;
+            height: 5px;
+            cursor: s-resize;
+        }
+
+        .window-resize-handle.w {
+            top: 5px;
+            left: 0;
+            bottom: 5px;
+            width: 5px;
+            cursor: w-resize;
+        }
+
+        .window-resize-handle.ne {
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            cursor: ne-resize;
+        }
+
+        .window-resize-handle.nw {
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            cursor: nw-resize;
+        }
+
+        .window-resize-handle.se {
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            cursor: se-resize;
+        }
+
+        .window-resize-handle.sw {
+            bottom: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            cursor: sw-resize;
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop -->
+    <div id="desktop">
+        <div class="desktop-icons">
+            <div class="desktop-icon" onclick="openApp('file-explorer')" data-app="file-explorer">
+                <i class="fas fa-folder"></i>
+                <span>File Explorer</span>
+            </div>
+            <div class="desktop-icon" onclick="openApp('browser')" data-app="browser">
+                <i class="fas fa-globe"></i>
+                <span>Web Browser</span>
+            </div>
+            <div class="desktop-icon" onclick="openApp('notepad')" data-app="notepad">
+                <i class="fas fa-edit"></i>
+                <span>Notepad</span>
+            </div>
+            <div class="desktop-icon" onclick="openApp('calculator')" data-app="calculator">
+                <i class="fas fa-calculator"></i>
+                <span>Calculator</span>
+            </div>
+            <div class="desktop-icon" onclick="openApp('media-player')" data-app="media-player">
+                <i class="fas fa-play-circle"></i>
+                <span>Media Player</span>
+            </div>
+            <div class="desktop-icon" onclick="openApp('terminal')" data-app="terminal">
+                <i class="fas fa-terminal"></i>
+                <span>Terminal</span>
+            </div>
+            <div class="desktop-icon" onclick="openApp('settings')" data-app="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <!-- Windows -->
+        <div id="browser-window" class="window" style="width: 800px; height: 500px; top: 50px; left: 100px;">
+            <div class="window-header">
+                <div>Web Browser</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('browser-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('browser-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('browser-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="browser-url-bar">
+                <div class="browser-controls">
+                    <div class="browser-control" onclick="browserBack()"><i class="fas fa-arrow-left"></i></div>
+                    <div class="browser-control" onclick="browserForward()"><i class="fas fa-arrow-right"></i></div>
+                    <div class="browser-control" onclick="browserRefresh()"><i class="fas fa-redo"></i></div>
+                </div>
+                <input type="text" class="browser-url-input" value="https://webos-homepage.com" id="browser-url">
+                <div class="browser-controls">
+                    <div class="browser-control" onclick="browserGo()"><i class="fas fa-search"></i></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <iframe id="browser-frame" class="browser-content" src="about:blank"></iframe>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+
+        <div id="file-explorer-window" class="window" style="width: 700px; height: 450px; top: 80px; left: 150px;">
+            <div class="window-header">
+                <div>File Explorer</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('file-explorer-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('file-explorer-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('file-explorer-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="file-path">
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-right"></i>
+                <i class="fas fa-arrow-up"></i>
+                <input type="text" id="file-explorer-path" value="C:\Users\WebOS\Desktop" readonly>
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="window-content">
+                <div class="file-explorer-layout">
+                    <div class="file-explorer-sidebar">
+                        <div class="sidebar-item active" data-folder="desktop">
+                            <i class="fas fa-desktop"></i>
+                            <span>Desktop</span>
+                        </div>
+                        <div class="sidebar-item" data-folder="downloads">
+                            <i class="fas fa-download"></i>
+                            <span>Downloads</span>
+                        </div>
+                        <div class="sidebar-item" data-folder="documents">
+                            <i class="fas fa-file"></i>
+                            <span>Documents</span>
+                        </div>
+                        <div class="sidebar-item" data-folder="pictures">
+                            <i class="fas fa-image"></i>
+                            <span>Pictures</span>
+                        </div>
+                        <div class="sidebar-item" data-folder="music">
+                            <i class="fas fa-music"></i>
+                            <span>Music</span>
+                        </div>
+                        <div class="sidebar-item" data-folder="videos">
+                            <i class="fas fa-film"></i>
+                            <span>Videos</span>
+                        </div>
+                    </div>
+                    <div class="file-explorer-content">
+                        <div class="file-grid" id="file-explorer-grid">
+                            <!-- Files will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+
+        <div id="notepad-window" class="window" style="width: 500px; height: 400px; top: 100px; left: 200px;">
+            <div class="window-header">
+                <div>Notepad</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('notepad-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('notepad-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('notepad-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="notepad-menu">
+                <div class="notepad-menu-item" onclick="notepadNew()">New</div>
+                <div class="notepad-menu-item" onclick="notepadOpen()">Open</div>
+                <div class="notepad-menu-item" onclick="notepadSave()">Save</div>
+                <div class="notepad-menu-item" onclick="notepadPrint()">Print</div>
+            </div>
+            <div class="window-content">
+                <textarea class="notepad-textarea" id="notepad-text">Welcome to WebOS!
+
+This is a browser-based operating system with a Windows 11 inspired interface.
+
+You can:
+- Open applications from the Start menu or desktop
+- Move and resize windows
+- Use the file explorer to browse files
+- Browse the web with the built-in browser
+- And much more!
+
+Try opening other applications to explore the full functionality.</textarea>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+
+        <div id="calculator-window" class="window calculator" style="width: 320px; height: 420px; top: 120px; left: 250px;">
+            <div class="window-header">
+                <div>Calculator</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('calculator-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('calculator-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('calculator-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="calculator-display" id="calc-display">0</div>
+                <div class="calculator-buttons">
+                    <button class="calc-btn" onclick="clearCalculator()">C</button>
+                    <button class="calc-btn" onclick="appendToCalc('/')">/</button>
+                    <button class="calc-btn" onclick="appendToCalc('*')">×</button>
+                    <button class="calc-btn" onclick="backspaceCalc()">⌫</button>
+                    <button class="calc-btn" onclick="appendToCalc('7')">7</button>
+                    <button class="calc-btn" onclick="appendToCalc('8')">8</button>
+                    <button class="calc-btn" onclick="appendToCalc('9')">9</button>
+                    <button class="calc-btn operator" onclick="appendToCalc('-')">-</button>
+                    <button class="calc-btn" onclick="appendToCalc('4')">4</button>
+                    <button class="calc-btn" onclick="appendToCalc('5')">5</button>
+                    <button class="calc-btn" onclick="appendToCalc('6')">6</button>
+                    <button class="calc-btn operator" onclick="appendToCalc('+')">+</button>
+                    <button class="calc-btn" onclick="appendToCalc('1')">1</button>
+                    <button class="calc-btn" onclick="appendToCalc('2')">2</button>
+                    <button class="calc-btn" onclick="appendToCalc('3')">3</button>
+                    <button class="calc-btn equals" onclick="calculateResult()" style="grid-row: span 2;">=</button>
+                    <button class="calc-btn" onclick="appendToCalc('0')" style="grid-column: span 2;">0</button>
+                    <button class="calc-btn" onclick="appendToCalc('.')">.</button>
+                </div>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+
+        <div id="media-player-window" class="window media-player" style="width: 500px; height: 350px; top: 150px; left: 300px;">
+            <div class="window-header">
+                <div>Media Player</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('media-player-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('media-player-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('media-player-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div style="text-align: center; padding: 20px 0;">
+                    <i class="fas fa-music" style="font-size: 64px; color: #5f6368; margin-bottom: 20px;"></i>
+                    <p>Media Player is ready to play your files</p>
+                    <div class="media-progress">
+                        <div class="media-progress-bar"></div>
+                    </div>
+                </div>
+                <div class="media-controls">
+                    <button class="media-control"><i class="fas fa-backward"></i></button>
+                    <button class="media-control"><i class="fas fa-play"></i></button>
+                    <button class="media-control"><i class="fas fa-forward"></i></button>
+                </div>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+
+        <div id="terminal-window" class="window" style="width: 600px; height: 400px; top: 180px; left: 350px;">
+            <div class="window-header">
+                <div>Terminal</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('terminal-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('terminal-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('terminal-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="terminal" id="terminal-content">
+                    <div class="terminal-line">WebOS Terminal v2.0</div>
+                    <div class="terminal-line">Type 'help' for available commands</div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">user@webos:~$</span>
+                        <input type="text" class="terminal-input" id="terminal-input" onkeypress="handleTerminalInput(event)">
+                    </div>
+                </div>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+
+        <div id="settings-window" class="window" style="width: 700px; height: 500px; top: 200px; left: 400px;">
+            <div class="window-header">
+                <div>Settings</div>
+                <div class="window-controls">
+                    <div class="window-control minimize" onclick="minimizeWindow('settings-window')"><i class="fas fa-minus"></i></div>
+                    <div class="window-control maximize" onclick="maximizeWindow('settings-window')"><i class="fas fa-square"></i></div>
+                    <div class="window-control close" onclick="closeWindow('settings-window')"><i class="fas fa-times"></i></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="settings-layout">
+                    <div class="settings-sidebar">
+                        <div class="sidebar-item active" data-settings="system">
+                            <i class="fas fa-cog"></i>
+                            <span>System</span>
+                        </div>
+                        <div class="sidebar-item" data-settings="personalization">
+                            <i class="fas fa-palette"></i>
+                            <span>Personalization</span>
+                        </div>
+                        <div class="sidebar-item" data-settings="apps">
+                            <i class="fas fa-th"></i>
+                            <span>Apps</span>
+                        </div>
+                        <div class="sidebar-item" data-settings="privacy">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Privacy & Security</span>
+                        </div>
+                    </div>
+                    <div class="settings-content">
+                        <div class="settings-category" id="system-settings">
+                            <h2 class="settings-title">System Settings</h2>
+                            <div class="settings-option">
+                                <label for="dark-mode">Dark Mode</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="dark-mode" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-option">
+                                <label for="animations">Window Animations</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="animations" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-option">
+                                <label for="sound-effects">Sound Effects</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="sound-effects">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="settings-category" id="personalization-settings" style="display: none;">
+                            <h2 class="settings-title">Personalization</h2>
+                            <div class="settings-option">
+                                <label for="wallpaper">Wallpaper</label>
+                                <select id="wallpaper">
+                                    <option value="default">Default</option>
+                                    <option value="nature">Nature</option>
+                                    <option value="abstract">Abstract</option>
+                                    <option value="solid">Solid Color</option>
+                                </select>
+                            </div>
+                            <div class="settings-option">
+                                <label for="theme-color">Theme Color</label>
+                                <input type="color" id="theme-color" value="#0078d4">
+                            </div>
+                        </div>
+                        <div class="settings-category" id="apps-settings" style="display: none;">
+                            <h2 class="settings-title">Apps & Features</h2>
+                            <div class="settings-option">
+                                <label>Installed Apps</label>
+                                <div style="margin-top: 10px;">
+                                    <div style="padding: 10px; background: #f1f3f4; border-radius: 5px; margin-bottom: 5px;">
+                                        File Explorer <span style="float: right; color: #5f6368;">System App</span>
+                                    </div>
+                                    <div style="padding: 10px; background: #f1f3f4; border-radius: 5px; margin-bottom: 5px;">
+                                        Web Browser <span style="float: right; color: #5f6368;">System App</span>
+                                    </div>
+                                    <div style="padding: 10px; background: #f1f3f4; border-radius: 5px; margin-bottom: 5px;">
+                                        Notepad <span style="float: right; color: #5f6368;">System App</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-category" id="privacy-settings" style="display: none;">
+                            <h2 class="settings-title">Privacy & Security</h2>
+                            <div class="settings-option">
+                                <label for="location">Location Services</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="location">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-option">
+                                <label for="diagnostics">Diagnostic Data</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="diagnostics">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="window-resize-handle n"></div>
+            <div class="window-resize-handle e"></div>
+            <div class="window-resize-handle s"></div>
+            <div class="window-resize-handle w"></div>
+            <div class="window-resize-handle ne"></div>
+            <div class="window-resize-handle nw"></div>
+            <div class="window-resize-handle se"></div>
+            <div class="window-resize-handle sw"></div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div id="taskbar">
+        <button class="start-button" onclick="toggleStartMenu()">
+            <i class="fab fa-windows"></i>
+            <span>Start</span>
+        </button>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" onclick="toggleApp('file-explorer')" data-app="file-explorer">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="taskbar-icon" onclick="toggleApp('browser')" data-app="browser">
+                <i class="fas fa-globe"></i>
+            </div>
+            <div class="taskbar-icon" onclick="toggleApp('notepad')" data-app="notepad">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div class="taskbar-icon" onclick="toggleApp('calculator')" data-app="calculator">
+                <i class="fas fa-calculator"></i>
+            </div>
+        </div>
+        <div class="system-tray">
+            <div class="taskbar-icon">
+                <i class="fas fa-wifi"></i>
+            </div>
+            <div class="taskbar-icon">
+                <i class="fas fa-volume-up"></i>
+            </div>
+            <div class="taskbar-icon">
+                <i class="fas fa-battery-full"></i>
+            </div>
+            <div class="time" id="current-time">12:00 PM</div>
+        </div>
+    </div>
+
+    <!-- Start Menu -->
+    <div id="start-menu">
+        <div class="start-menu-header">
+            <h2>WebOS 2.0</h2>
+            <p>Browser-Based Desktop Environment</p>
+        </div>
+        <div class="start-menu-apps">
+            <div class="start-menu-app" onclick="openApp('file-explorer')">
+                <i class="fas fa-folder"></i>
+                <span>File Explorer</span>
+            </div>
+            <div class="start-menu-app" onclick="openApp('browser')">
+                <i class="fas fa-globe"></i>
+                <span>Web Browser</span>
+            </div>
+            <div class="start-menu-app" onclick="openApp('notepad')">
+                <i class="fas fa-edit"></i>
+                <span>Notepad</span>
+            </div>
+            <div class="start-menu-app" onclick="openApp('calculator')">
+                <i class="fas fa-calculator"></i>
+                <span>Calculator</span>
+            </div>
+            <div class="start-menu-app" onclick="openApp('media-player')">
+                <i class="fas fa-play-circle"></i>
+                <span>Media Player</span>
+            </div>
+            <div class="start-menu-app" onclick="openApp('terminal')">
+                <i class="fas fa-terminal"></i>
+                <span>Terminal</span>
+            </div>
+            <div class="start-menu-app" onclick="openApp('settings')">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="start-menu-app" onclick="shutdown()">
+                <i class="fas fa-power-off"></i>
+                <span>Shutdown</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu">
+        <div class="context-item" onclick="openApp('file-explorer')">
+            <i class="fas fa-folder-open"></i>
+            <span>Open</span>
+        </div>
+        <div class="context-item">
+            <i class="fas fa-copy"></i>
+            <span>Copy</span>
+        </div>
+        <div class="context-item">
+            <i class="fas fa-paste"></i>
+            <span>Paste</span>
+        </div>
+        <div class="context-item">
+            <i class="fas fa-trash"></i>
+            <span>Delete</span>
+        </div>
+        <div class="context-item">
+            <i class="fas fa-cog"></i>
+            <span>Properties</span>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <div class="notification-title" id="notification-title">Notification</div>
+        <div class="notification-message" id="notification-message">This is a notification message</div>
+    </div>
+
+    <script>
+        // Global variables
+        let activeWindows = [];
+        let zIndexCounter = 100;
+        let currentCalcValue = '0';
+        let calcOperation = null;
+        let calcPreviousValue = null;
+
+        // Initialize the OS
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            populateFileExplorer('desktop');
+            setupWindowDrag();
+            setupContextMenu();
+            setupSettings();
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome to WebOS 2.0', 'Your browser-based desktop environment is ready!');
+            }, 1000);
+        });
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        // Toggle start menu
+        function toggleStartMenu() {
+            const startMenu = document.getElementById('start-menu');
+            startMenu.style.display = startMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Open application
+        function openApp(appName) {
+            const windowId = `${appName}-window`;
+            const windowElement = document.getElementById(windowId);
+            
+            if (windowElement) {
+                // Close start menu if open
+                document.getElementById('start-menu').style.display = 'none';
+                
+                // Show the window
+                windowElement.style.display = 'flex';
+                windowElement.style.zIndex = zIndexCounter++;
+                
+                // Add to active windows
+                if (!activeWindows.includes(windowId)) {
+                    activeWindows.push(windowId);
+                }
+                
+                // Update taskbar icon
+                updateTaskbarIcon(appName, true);
+                
+                // Focus the window
+                focusWindow(windowId);
+            }
+        }
+
+        // Toggle application (minimize/restore)
+        function toggleApp(appName) {
+            const windowId = `${appName}-window`;
+            const windowElement = document.getElementById(windowId);
+            
+            if (windowElement) {
+                if (windowElement.style.display === 'none') {
+                    // Show the window
+                    openApp(appName);
+                } else {
+                    // Minimize the window
+                    minimizeWindow(windowId);
+                }
+            }
+        }
+
+        // Close window
+        function closeWindow(windowId) {
+            const windowElement = document.getElementById(windowId);
+            if (windowElement) {
+                windowElement.style.display = 'none';
+                
+                // Remove from active windows
+                const index = activeWindows.indexOf(windowId);
+                if (index > -1) {
+                    activeWindows.splice(index, 1);
+                }
+                
+                // Update taskbar icon
+                const appName = windowId.replace('-window', '');
+                updateTaskbarIcon(appName, false);
+            }
+        }
+
+        // Minimize window
+        function minimizeWindow(windowId) {
+            const windowElement = document.getElementById(windowId);
+            if (windowElement) {
+                windowElement.style.display = 'none';
+                
+                // Update taskbar icon
+                const appName = windowId.replace('-window', '');
+                updateTaskbarIcon(appName, false);
+            }
+        }
+
+        // Maximize window
+        function maximizeWindow(windowId) {
+            const windowElement = document.getElementById(windowId);
+            if (windowElement) {
+                if (windowElement.classList.contains('maximized')) {
+                    windowElement.classList.remove('maximized');
+                } else {
+                    windowElement.classList.add('maximized');
+                }
+            }
+        }
+
+        // Focus window (bring to front)
+        function focusWindow(windowId) {
+            const windowElement = document.getElementById(windowId);
+            if (windowElement) {
+                windowElement.style.zIndex = zIndexCounter++;
+            }
+        }
+
+        // Update taskbar icon state
+        function updateTaskbarIcon(appName, isActive) {
+            const taskbarIcon = document.querySelector(`.taskbar-icon[data-app="${appName}"]`);
+            if (taskbarIcon) {
+                if (isActive) {
+                    taskbarIcon.classList.add('active');
+                } else {
+                    taskbarIcon.classList.remove('active');
+                }
+            }
+        }
+
+        // Setup window dragging
+        function setupWindowDrag() {
+            const windows = document.querySelectorAll('.window');
+            
+            windows.forEach(window => {
+                const header = window.querySelector('.window-header');
+                
+                header.addEventListener('mousedown', function(e) {
+                    // Focus the window
+                    focusWindow(window.id);
+                    
+                    // Get initial mouse position
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    
+                    // Get initial window position
+                    const startLeft = parseInt(window.style.left) || 0;
+                    const startTop = parseInt(window.style.top) || 0;
+                    
+                    // Mouse move handler
+                    function mouseMoveHandler(e) {
+                        // Calculate new position
+                        const newLeft = startLeft + e.clientX - startX;
+                        const newTop = startTop + e.clientY - startY;
+                        
+                        // Apply new position
+                        window.style.left = `${newLeft}px`;
+                        window.style.top = `${newTop}px`;
+                    }
+                    
+                    // Mouse up handler
+                    function mouseUpHandler() {
+                        document.removeEventListener('mousemove', mouseMoveHandler);
+                        document.removeEventListener('mouseup', mouseUpHandler);
+                    }
+                    
+                    // Add event listeners
+                    document.addEventListener('mousemove', mouseMoveHandler);
+                    document.addEventListener('mouseup', mouseUpHandler);
+                });
+            });
+        }
+
+        // Setup context menu
+        function setupContextMenu() {
+            const desktop = document.getElementById('desktop');
+            const contextMenu = document.getElementById('context-menu');
+            
+            desktop.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                
+                // Show context menu at mouse position
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = `${e.clientX}px`;
+                contextMenu.style.top = `${e.clientY}px`;
+            });
+            
+            // Hide context menu on click elsewhere
+            document.addEventListener('click', function() {
+                contextMenu.style.display = 'none';
+            });
+        }
+
+        // Setup settings
+        function setupSettings() {
+            // Settings sidebar navigation
+            const settingsItems = document.querySelectorAll('.settings-sidebar .sidebar-item');
+            
+            settingsItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    settingsItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Show corresponding settings
+                    const settingsType = this.getAttribute('data-settings');
+                    const settingsCategories = document.querySelectorAll('.settings-category');
+                    
+                    settingsCategories.forEach(category => {
+                        category.style.display = 'none';
+                    });
+                    
+                    document.getElementById(`${settingsType}-settings`).style.display = 'block';
+                });
+            });
+            
+            // File explorer sidebar navigation
+            const fileExplorerItems = document.querySelectorAll('.file-explorer-sidebar .sidebar-item');
+            
+            fileExplorerItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    fileExplorerItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Populate file explorer with files from selected folder
+                    const folder = this.getAttribute('data-folder');
+                    populateFileExplorer(folder);
+                });
+            });
+        }
+
+        // Populate file explorer with files
+        function populateFileExplorer(folder) {
+            const fileGrid = document.getElementById('file-explorer-grid');
+            fileGrid.innerHTML = '';
+            
+            // Define files for each folder
+            const files = {
+                desktop: [
+                    { name: 'Document.txt', type: 'file', icon: 'file-text' },
+                    { name: 'Spreadsheet.xlsx', type: 'file', icon: 'file-excel' },
+                    { name: 'Presentation.pptx', type: 'file', icon: 'file-powerpoint' },
+                    { name: 'Image.jpg', type: 'file', icon: 'file-image' },
+                    { name: 'Music.mp3', type: 'file', icon: 'file-audio' },
+                    { name: 'Video.mp4', type: 'file', icon: 'file-video' }
+                ],
+                downloads: [
+                    { name: 'Software.zip', type: 'file', icon: 'file-archive' },
+                    { name: 'Manual.pdf', type: 'file', icon: 'file-pdf' }
+                ],
+                documents: [
+                    { name: 'Resume.docx', type: 'file', icon: 'file-word' },
+                    { name: 'Project Plan.docx', type: 'file', icon: 'file-word' },
+                    { name: 'Budget.xlsx', type: 'file', icon: 'file-excel' }
+                ],
+                pictures: [
+                    { name: 'Vacation.jpg', type: 'file', icon: 'file-image' },
+                    { name: 'Family.png', type: 'file', icon: 'file-image' },
+                    { name: 'Screenshot.png', type: 'file', icon: 'file-image' }
+                ],
+                music: [
+                    { name: 'Song 1.mp3', type: 'file', icon: 'file-audio' },
+                    { name: 'Song 2.mp3', type: 'file', icon: 'file-audio' },
+                    { name: 'Album', type: 'folder', icon: 'folder' }
+                ],
+                videos: [
+                    { name: 'Movie.mp4', type: 'file', icon: 'file-video' },
+                    { name: 'Tutorial.mkv', type: 'file', icon: 'file-video' }
+                ]
+            };
+            
+            // Add files to the grid
+            if (files[folder]) {
+                files[folder].forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    
+                    fileItem.innerHTML = `
+                        <i class="fas fa-${file.icon}"></i>
+                        <span>${file.name}</span>
+                    `;
+                    
+                    fileGrid.appendChild(fileItem);
+                });
+            }
+        }
+
+        // Browser functions
+        function browserBack() {
+            showNotification('Browser', 'Back button clicked');
+        }
+
+        function browserForward() {
+            showNotification('Browser', 'Forward button clicked');
+        }
+
+        function browserRefresh() {
+            showNotification('Browser', 'Refresh button clicked');
+        }
+
+        function browserGo() {
+            const url = document.getElementById('browser-url').value;
+            showNotification('Browser', `Navigating to ${url}`);
+        }
+
+        // Notepad functions
+        function notepadNew() {
+            document.getElementById('notepad-text').value = '';
+            showNotification('Notepad', 'New document created');
+        }
+
+        function notepadOpen() {
+            showNotification('Notepad', 'Open file dialog');
+        }
+
+        function notepadSave() {
+            showNotification('Notepad', 'File saved');
+        }
+
+        function notepadPrint() {
+            showNotification('Notepad', 'Print dialog opened');
+        }
+
+        // Calculator functions
+        function appendToCalc(value) {
+            if (currentCalcValue === '0' && value !== '.') {
+                currentCalcValue = value;
+            } else {
+                currentCalcValue += value;
+            }
+            document.getElementById('calc-display').textContent = currentCalcValue;
+        }
+
+        function clearCalculator() {
+            currentCalcValue = '0';
+            calcOperation = null;
+            calcPreviousValue = null;
+            document.getElementById('calc-display').textContent = currentCalcValue;
+        }
+
+        function backspaceCalc() {
+            if (currentCalcValue.length > 1) {
+                currentCalcValue = currentCalcValue.slice(0, -1);
+            } else {
+                currentCalcValue = '0';
+            }
+            document.getElementById('calc-display').textContent = currentCalcValue;
+        }
+
+        function calculateResult() {
+            try {
+                // Replace × with * for evaluation
+                const expression = currentCalcValue.replace(/×/g, '*');
+                const result = eval(expression);
+                currentCalcValue = result.toString();
+                document.getElementById('calc-display').textContent = currentCalcValue;
+            } catch (error) {
+                currentCalcValue = 'Error';
+                document.getElementById('calc-display').textContent = currentCalcValue;
+            }
+        }
+
+        // Terminal functions
+        function handleTerminalInput(e) {
+            if (e.key === 'Enter') {
+                const input = e.target.value;
+                const terminalContent = document.getElementById('terminal-content');
+                
+                // Add the command to the terminal
+                const commandLine = document.createElement('div');
+                commandLine.className = 'terminal-line';
+                commandLine.innerHTML = `<span class="terminal-prompt">user@webos:~$</span> ${input}`;
+                terminalContent.appendChild(commandLine);
+                
+                // Process the command
+                processTerminalCommand(input);
+                
+                // Clear input and add new prompt
+                e.target.value = '';
+                const newPrompt = document.createElement('div');
+                newPrompt.className = 'terminal-line';
+                newPrompt.innerHTML = '<span class="terminal-prompt">user@webos:~$</span> <input type="text" class="terminal-input" onkeypress="handleTerminalInput(event)">';
+                terminalContent.appendChild(newPrompt);
+                
+                // Scroll to bottom
+                terminalContent.scrollTop = terminalContent.scrollHeight;
+                
+                // Focus the new input
+                setTimeout(() => {
+                    newPrompt.querySelector('input').focus();
+                }, 10);
+            }
+        }
+
+        function processTerminalCommand(command) {
+            const terminalContent = document.getElementById('terminal-content');
+            const output = document.createElement('div');
+            output.className = 'terminal-line';
+            
+            switch (command.toLowerCase()) {
+                case 'help':
+                    output.textContent = 'Available commands: help, date, time, clear, about, echo [text]';
+                    break;
+                case 'date':
+                    output.textContent = new Date().toDateString();
+                    break;
+                case 'time':
+                    output.textContent = new Date().toLocaleTimeString();
+                    break;
+                case 'clear':
+                    terminalContent.innerHTML = '';
+                    return;
+                case 'about':
+                    output.textContent = 'WebOS Terminal v2.0 - Browser-based Operating System';
+                    break;
+                case 'ls':
+                    output.textContent = 'desktop  documents  downloads  pictures  music  videos';
+                    break;
+                case 'pwd':
+                    output.textContent = '/home/user';
+                    break;
+                default:
+                    if (command.startsWith('echo ')) {
+                        output.textContent = command.substring(5);
+                    } else {
+                        output.textContent = `Command not found: ${command}`;
+                    }
+            }
+            
+            terminalContent.appendChild(output);
+        }
+
+        // Show notification
+        function showNotification(title, message) {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notification.style.display = 'block';
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Shutdown function
+        function shutdown() {
+            if (confirm('Are you sure you want to shut down WebOS?')) {
+                document.body.innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #fff; font-size: 24px;">
+                        <div style="text-align: center;">
+                            <i class="fas fa-power-off" style="font-size: 64px; margin-bottom: 20px;"></i>
+                            <div>WebOS is shutting down...</div>
+                        </div>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    document.body.innerHTML = `
+                        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #fff; font-size: 18px;">
+                            <div style="text-align: center;">
+                                <div>It's now safe to turn off your computer.</div>
+                            </div>
+                        </div>
+                    `;
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>

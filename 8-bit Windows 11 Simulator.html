@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-bit Windows 11 Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Desktop */
+        #desktop {
+            width: 100%;
+            height: calc(100% - 40px);
+            background: linear-gradient(135deg, #004a8f 0%, #0066b8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Taskbar */
+        #taskbar {
+            height: 40px;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .start-button {
+            background: #2b2b2b;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        .taskbar-icons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .taskbar-icon {
+            width: 32px;
+            height: 32px;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid #555;
+            font-size: 12px;
+        }
+        
+        /* Window */
+        .window {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #fff;
+            border-left-color: #fff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            min-width: 300px;
+            min-height: 200px;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .window-header {
+            background: #000080;
+            color: white;
+            padding: 3px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .window-control {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px solid;
+            border-top-color: #fff;
+            border-left-color: #fff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .window-content {
+            flex: 1;
+            padding: 5px;
+            overflow: auto;
+            color: black;
+        }
+        
+        /* Icons */
+        .desktop-icon {
+            position: absolute;
+            width: 64px;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            text-shadow: 1px 1px 0 #000;
+            font-size: 12px;
+        }
+        
+        .icon-image {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 5px;
+            background: #555;
+            border: 1px solid #aaa;
+        }
+        
+        /* Start Menu */
+        #start-menu {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 300px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #fff;
+            border-left-color: #fff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            display: none;
+            z-index: 1001;
+        }
+        
+        .start-menu-header {
+            background: #000080;
+            color: white;
+            padding: 5px;
+            font-size: 14px;
+        }
+        
+        .start-menu-apps {
+            padding: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        
+        .start-menu-app {
+            padding: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid transparent;
+        }
+        
+        .start-menu-app:hover {
+            background: #000080;
+            color: white;
+        }
+        
+        /* Browser */
+        .browser-url-bar {
+            display: flex;
+            padding: 5px;
+            background: #c0c0c0;
+            border-bottom: 1px solid #808080;
+        }
+        
+        .browser-url-input {
+            flex: 1;
+            padding: 2px 5px;
+            border: 1px solid #808080;
+        }
+        
+        .browser-content {
+            width: 100%;
+            height: 300px;
+            background: white;
+            border: none;
+        }
+        
+        /* Settings */
+        .settings-category {
+            margin-bottom: 10px;
+            border: 1px solid #808080;
+            padding: 5px;
+        }
+        
+        .settings-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .settings-option {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        /* Calculator */
+        .calculator-display {
+            background: #000;
+            color: #0f0;
+            padding: 5px;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 5px;
+            border: 1px solid #808080;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+        }
+        
+        .calculator-button {
+            padding: 5px;
+            background: #e0e0e0;
+            border: 1px solid #808080;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .calculator-button.operator {
+            background: #f0a0a0;
+        }
+        
+        /* Notepad */
+        .notepad-textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 5px;
+        }
+        
+        /* File Explorer */
+        .file-explorer-sidebar {
+            width: 150px;
+            background: #e0e0e0;
+            border-right: 1px solid #808080;
+            padding: 5px;
+            font-size: 12px;
+        }
+        
+        .file-explorer-content {
+            flex: 1;
+            padding: 5px;
+            font-size: 12px;
+        }
+        
+        .file-item {
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+        
+        .file-item:hover {
+            background: #000080;
+            color: white;
+        }
+        
+        /* Pixelated effect */
+        .pixelated {
+            image-rendering: pixelated;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .window {
+                width: 90% !important;
+                height: 70% !important;
+                left: 5% !important;
+                top: 15% !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop -->
+    <div id="desktop">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" style="top: 20px; left: 20px;" onclick="openApp('browser')">
+            <div class="icon-image"></div>
+            <div>Web Browser</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 20px; left: 100px;" onclick="openApp('file-explorer')">
+            <div class="icon-image"></div>
+            <div>File Explorer</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 100px; left: 20px;" onclick="openApp('notepad')">
+            <div class="icon-image"></div>
+            <div>Notepad</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 100px; left: 100px;" onclick="openApp('calculator')">
+            <div class="icon-image"></div>
+            <div>Calculator</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 180px; left: 20px;" onclick="openApp('settings')">
+            <div class="icon-image"></div>
+            <div>Settings</div>
+        </div>
+        
+        <!-- Windows -->
+        <div id="browser-window" class="window" style="width: 600px; height: 400px; top: 50px; left: 100px;">
+            <div class="window-header">
+                <div>Web Browser</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('browser-window')">-</div>
+                    <div class="window-control" onclick="maximizeWindow('browser-window')">□</div>
+                    <div class="window-control" onclick="closeWindow('browser-window')">X</div>
+                </div>
+            </div>
+            <div class="browser-url-bar">
+                <input type="text" class="browser-url-input" value="https://8bit-web.com" id="browser-url">
+                <button class="window-control" onclick="navigateBrowser()">Go</button>
+            </div>
+            <div class="window-content">
+                <iframe id="browser-frame" class="browser-content" src="about:blank"></iframe>
+            </div>
+        </div>
+        
+        <div id="file-explorer-window" class="window" style="width: 500px; height: 350px; top: 80px; left: 200px;">
+            <div class="window-header">
+                <div>File Explorer</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('file-explorer-window')">-</div>
+                    <div class="window-control" onclick="maximizeWindow('file-explorer-window')">□</div>
+                    <div class="window-control" onclick="closeWindow('file-explorer-window')">X</div>
+                </div>
+            </div>
+            <div class="window-content" style="display: flex;">
+                <div class="file-explorer-sidebar">
+                    <div class="file-item">This PC</div>
+                    <div class="file-item">Desktop</div>
+                    <div class="file-item">Documents</div>
+                    <div class="file-item">Pictures</div>
+                    <div class="file-item">Music</div>
+                </div>
+                <div class="file-explorer-content">
+                    <div class="file-item">File1.txt</div>
+                    <div class="file-item">File2.doc</div>
+                    <div class="file-item">Image.png</div>
+                    <div class="file-item">Program.exe</div>
+                    <div class="file-item">Readme.md</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="notepad-window" class="window" style="width: 400px; height: 300px; top: 120px; left: 150px;">
+            <div class="window-header">
+                <div>Notepad - Untitled</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('notepad-window')">-</div>
+                    <div class="window-control" onclick="maximizeWindow('notepad-window')">□</div>
+                    <div class="window-control" onclick="closeWindow('notepad-window')">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <textarea class="notepad-textarea" placeholder="Start typing...">Welcome to 8-bit Windows 11!</textarea>
+            </div>
+        </div>
+        
+        <div id="calculator-window" class="window" style="width: 250px; height: 300px; top: 100px; left: 300px;">
+            <div class="window-header">
+                <div>Calculator</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('calculator-window')">-</div>
+                    <div class="window-control" onclick="maximizeWindow('calculator-window')">□</div>
+                    <div class="window-control" onclick="closeWindow('calculator-window')">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="calculator-display" id="calc-display">0</div>
+                <div class="calculator-buttons">
+                    <div class="calculator-button" onclick="clearCalculator()">C</div>
+                    <div class="calculator-button" onclick="appendToCalc('/')">/</div>
+                    <div class="calculator-button" onclick="appendToCalc('*')">*</div>
+                    <div class="calculator-button" onclick="backspaceCalc()">←</div>
+                    <div class="calculator-button" onclick="appendToCalc('7')">7</div>
+                    <div class="calculator-button" onclick="appendToCalc('8')">8</div>
+                    <div class="calculator-button" onclick="appendToCalc('9')">9</div>
+                    <div class="calculator-button operator" onclick="appendToCalc('-')">-</div>
+                    <div class="calculator-button" onclick="appendToCalc('4')">4</div>
+                    <div class="calculator-button" onclick="appendToCalc('5')">5</div>
+                    <div class="calculator-button" onclick="appendToCalc('6')">6</div>
+                    <div class="calculator-button operator" onclick="appendToCalc('+')">+</div>
+                    <div class="calculator-button" onclick="appendToCalc('1')">1</div>
+                    <div class="calculator-button" onclick="appendToCalc('2')">2</div>
+                    <div class="calculator-button" onclick="appendToCalc('3')">3</div>
+                    <div class="calculator-button operator" onclick="calculateResult()" style="grid-row: span 2;">=</div>
+                    <div class="calculator-button" onclick="appendToCalc('0')" style="grid-column: span 2;">0</div>
+                    <div class="calculator-button" onclick="appendToCalc('.')">.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="settings-window" class="window" style="width: 500px; height: 400px; top: 60px; left: 250px;">
+            <div class="window-header">
+                <div>Settings</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('settings-window')">-</div>
+                    <div class="window-control" onclick="maximizeWindow('settings-window')">□</div>
+                    <div class="window-control" onclick="closeWindow('settings-window')">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="settings-category">
+                    <div class="settings-title">System</div>
+                    <div class="settings-option">
+                        <label>8-bit Mode: <input type="checkbox" checked></label>
+                    </div>
+                    <div class="settings-option">
+                        <label>Pixel Density: <input type="range" min="1" max="10" value="5"></label>
+                    </div>
+                </div>
+                
+                <div class="settings-category">
+                    <div class="settings-title">Personalization</div>
+                    <div class="settings-option">
+                        <label>Desktop Color: 
+                            <select>
+                                <option>Blue</option>
+                                <option>Green</option>
+                                <option>Red</option>
+                                <option>Purple</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="settings-option">
+                        <label>Theme: 
+                            <select>
+                                <option>Classic</option>
+                                <option>Dark</option>
+                                <option>Light</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-category">
+                    <div class="settings-title">Apps</div>
+                    <div class="settings-option">
+                        <label>Default Browser: 
+                            <select>
+                                <option>8-bit Browser</option>
+                                <option>Retro Explorer</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Start Menu -->
+        <div id="start-menu">
+            <div class="start-menu-header">8-bit Windows 11</div>
+            <div class="start-menu-apps">
+                <div class="start-menu-app" onclick="openApp('browser')">
+                    <div class="icon-image"></div>
+                    <div>Web Browser</div>
+                </div>
+                <div class="start-menu-app" onclick="openApp('file-explorer')">
+                    <div class="icon-image"></div>
+                    <div>File Explorer</div>
+                </div>
+                <div class="start-menu-app" onclick="openApp('notepad')">
+                    <div class="icon-image"></div>
+                    <div>Notepad</div>
+                </div>
+                <div class="start-menu-app" onclick="openApp('calculator')">
+                    <div class="icon-image"></div>
+                    <div>Calculator</div>
+                </div>
+                <div class="start-menu-app" onclick="openApp('settings')">
+                    <div class="icon-image"></div>
+                    <div>Settings</div>
+                </div>
+                <div class="start-menu-app" onclick="shutdown()">
+                    <div class="icon-image"></div>
+                    <div>Shutdown</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Taskbar -->
+    <div id="taskbar">
+        <button class="start-button" onclick="toggleStartMenu()">Start</button>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" onclick="openApp('browser')">B</div>
+            <div class="taskbar-icon" onclick="openApp('file-explorer')">F</div>
+            <div class="taskbar-icon" onclick="openApp('notepad')">N</div>
+            <div class="taskbar-icon" onclick="openApp('calculator')">C</div>
+        </div>
+    </div>
+
+    <script>
+        // Window management
+        let zIndex = 1;
+        let activeWindow = null;
+        
+        function openApp(appName) {
+            const windowId = `${appName}-window`;
+            const windowElement = document.getElementById(windowId);
+            
+            if (windowElement) {
+                windowElement.style.display = 'flex';
+                windowElement.style.zIndex = zIndex++;
+                activeWindow = windowId;
+                
+                // Close start menu if open
+                document.getElementById('start-menu').style.display = 'none';
+            }
+        }
+        
+        function closeWindow(windowId) {
+            document.getElementById(windowId).style.display = 'none';
+        }
+        
+        function minimizeWindow(windowId) {
+            document.getElementById(windowId).style.display = 'none';
+        }
+        
+        function maximizeWindow(windowId) {
+            const windowElement = document.getElementById(windowId);
+            if (windowElement.style.width === '90%') {
+                windowElement.style.width = '';
+                windowElement.style.height = '';
+                windowElement.style.left = '';
+                windowElement.style.top = '';
+            } else {
+                windowElement.style.width = '90%';
+                windowElement.style.height = '70%';
+                windowElement.style.left = '5%';
+                windowElement.style.top = '15%';
+            }
+        }
+        
+        // Start menu
+        function toggleStartMenu() {
+            const startMenu = document.getElementById('start-menu');
+            startMenu.style.display = startMenu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Make windows draggable
+        document.addEventListener('DOMContentLoaded', function() {
+            const windows = document.querySelectorAll('.window');
+            
+            windows.forEach(window => {
+                const header = window.querySelector('.window-header');
+                
+                header.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    
+                    let posX = e.clientX;
+                    let posY = e.clientY;
+                    
+                    function mouseMoveHandler(e) {
+                        const dx = e.clientX - posX;
+                        const dy = e.clientY - posY;
+                        
+                        const left = parseInt(window.style.left) || 0;
+                        const top = parseInt(window.style.top) || 0;
+                        
+                        window.style.left = `${left + dx}px`;
+                        window.style.top = `${top + dy}px`;
+                        
+                        posX = e.clientX;
+                        posY = e.clientY;
+                        
+                        // Bring to front
+                        window.style.zIndex = zIndex++;
+                        activeWindow = window.id;
+                    }
+                    
+                    function mouseUpHandler() {
+                        document.removeEventListener('mousemove', mouseMoveHandler);
+                        document.removeEventListener('mouseup', mouseUpHandler);
+                    }
+                    
+                    document.addEventListener('mousemove', mouseMoveHandler);
+                    document.addEventListener('mouseup', mouseUpHandler);
+                });
+            });
+            
+            // Close start menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#start-menu') && !e.target.closest('.start-button')) {
+                    document.getElementById('start-menu').style.display = 'none';
+                }
+            });
+        });
+        
+        // Browser functionality
+        function navigateBrowser() {
+            const url = document.getElementById('browser-url').value;
+            const frame = document.getElementById('browser-frame');
+            
+            if (url) {
+                // For security reasons, we can't load arbitrary URLs in an iframe
+                // So we'll just show a message
+                frame.contentDocument.body.innerHTML = `
+                    <div style="padding: 20px; font-family: Arial, sans-serif;">
+                        <h1>8-bit Browser</h1>
+                        <p>Cannot navigate to: ${url}</p>
+                        <p>This is a simulated browser for demonstration purposes.</p>
+                        <p>Try these simulated sites:</p>
+                        <ul>
+                            <li><a href="javascript:showPage('home')">8bit-web.com</a></li>
+                            <li><a href="javascript:showPage('search')">Search Engine</a></li>
+                            <li><a href="javascript:showPage('news')">8-bit News</a></li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        function showPage(page) {
+            const frame = document.getElementById('browser-frame');
+            let content = '';
+            
+            switch(page) {
+                case 'home':
+                    content = `
+                        <div style="padding: 20px; font-family: Arial, sans-serif;">
+                            <h1>Welcome to 8bit-web.com</h1>
+                            <p>This is the homepage of the 8-bit internet!</p>
+                            <p>Explore our retro-style web pages.</p>
+                        </div>
+                    `;
+                    break;
+                case 'search':
+                    content = `
+                        <div style="padding: 20px; font-family: Arial, sans-serif;">
+                            <h1>8-bit Search</h1>
+                            <input type="text" style="width: 200px; padding: 5px;">
+                            <button>Search</button>
+                            <p>Try searching for "pixel art" or "retro computing"</p>
+                        </div>
+                    `;
+                    break;
+                case 'news':
+                    content = `
+                        <div style="padding: 20px; font-family: Arial, sans-serif;">
+                            <h1>8-bit News</h1>
+                            <h3>Latest Headlines:</h3>
+                            <ul>
+                                <li>New 8-bit game released</li>
+                                <li>Pixel art exhibition opens</li>
+                                <li>Retro computing convention next month</li>
+                            </ul>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            frame.contentDocument.body.innerHTML = content;
+        }
+        
+        // Calculator functionality
+        let calcValue = '0';
+        let calcOperator = '';
+        let calcWaitingForOperand = false;
+        
+        function updateCalcDisplay() {
+            document.getElementById('calc-display').textContent = calcValue;
+        }
+        
+        function appendToCalc(num) {
+            if (calcWaitingForOperand) {
+                calcValue = num;
+                calcWaitingForOperand = false;
+            } else {
+                calcValue = calcValue === '0' ? num : calcValue + num;
+            }
+            
+            updateCalcDisplay();
+        }
+        
+        function clearCalculator() {
+            calcValue = '0';
+            calcOperator = '';
+            calcWaitingForOperand = false;
+            updateCalcDisplay();
+        }
+        
+        function backspaceCalc() {
+            if (calcValue.length > 1) {
+                calcValue = calcValue.slice(0, -1);
+            } else {
+                calcValue = '0';
+            }
+            updateCalcDisplay();
+        }
+        
+        function calculateResult() {
+            // Simple calculation for demonstration
+            try {
+                calcValue = eval(calcValue).toString();
+            } catch (e) {
+                calcValue = 'Error';
+            }
+            updateCalcDisplay();
+            calcWaitingForOperand = true;
+        }
+        
+        // Shutdown simulation
+        function shutdown() {
+            document.body.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #fff; flex-direction: column;">
+                    <h1 style="font-size: 24px; margin-bottom: 20px;">8-bit Windows 11</h1>
+                    <p>Shutting down...</p>
+                    <div style="margin-top: 20px; width: 100px; height: 4px; background: #fff; position: relative; overflow: hidden;">
+                        <div id="shutdown-progress" style="position: absolute; top: 0; left: 0; height: 100%; background: #00f; width: 0%;"></div>
+                    </div>
+                    <button onclick="location.reload()" style="margin-top: 20px; padding: 5px 10px;">Restart</button>
+                </div>
+            `;
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                document.getElementById('shutdown-progress').style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.body.innerHTML = `
+                        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #fff;">
+                            <p>It's now safe to turn off your computer.</p>
+                        </div>
+                    `;
+                }
+            }, 100);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show welcome message in notepad
+            document.querySelector('.notepad-textarea').value = "Welcome to 8-bit Windows 11!\n\nThis is a simulation of a retro-style operating system.\n\nTry opening different applications from the Start menu or desktop icons.";
+            
+            // Initialize browser with a page
+            showPage('home');
+        });
+    </script>
+</body>
+</html>
